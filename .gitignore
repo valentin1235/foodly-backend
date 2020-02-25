@@ -1,7 +1,7 @@
 # Created by https://www.gitignore.io/api/linux,macos,django,python
 # Edit at https://www.gitignore.io/?templates=linux,macos,django,python
 ### Django ###
-my_settings.py:
+my_settings.py
 *.log
 *.pot
 *.pyc
