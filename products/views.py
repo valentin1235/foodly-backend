@@ -11,14 +11,16 @@ from .models import Product
 class ProductView(View):
     def get(self, request):
         products = Product.objects.select_related('harvest_year','measure','color','wood_type')
-        products_values = products.values('name',
+        products_values = products.values(
+                'name',
                 'price',
                 'thumbnail_url',
                 'harvest_year__year',
                 'measure_id__measure', 
                 'is_on_sale', 'is_in_stock',
                 'color_id__name', 
-                'wood_type_id__name')
+                'wood_type_id__name'
+        )
         return JsonResponse({'data' : list(products_values)}, status = 200)
 
 
