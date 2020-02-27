@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from .models import User
+from foodly_project.my_settings import SECRET_KEY
 
 
 # Create your views here.
@@ -53,7 +54,8 @@ class SignInView(View):
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):  # 특정값을 가지고 와야한다.
-                    token = jwt.encode({'email': data['email']}, "6기화이팅", algorithm='HS256').decode()
+                    token = jwt.encode({'email': data['email']}, SECRET_KEY.values(),
+                                       algorithm='HS256').decode()
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
                 return HttpResponse(status=401)
             return HttpResponse(status=400)
