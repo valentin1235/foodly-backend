@@ -29,12 +29,13 @@ class SignUpView(View):
             validate_email(data['email'])
 
             if User.objects.filter(email=data['email']).exists():
-                return HttpResponse(status=409)
+                return HttpResponse(status=400)
 
             if find_special(data['first_name']):
-                return HttpResponse(status=409)
+                return HttpResponse(status=400)
+
             if find_special(data['last_name']):
-                return HttpResponse(status=409)
+                return HttpResponse(status=400)
 
             if find_space(data['password']):
                 return HttpResponse(status=400)
@@ -50,7 +51,8 @@ class SignUpView(View):
             ).save()
 
         except ValidationError:
-            return HttpResponse(status=401)
+            return HttpResponse(status=400)
+
         except KeyError:
             return HttpResponse(status=400)
 
@@ -61,6 +63,7 @@ class SignInView(View):
         try:
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
+
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
                     token = jwt.encode({'email': data['email']}, SECRET_KEY.values(),
                                        ALGORITHM).decode()
@@ -72,5 +75,6 @@ class SignInView(View):
 
         except KeyError:
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
+
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
