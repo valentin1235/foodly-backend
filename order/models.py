@@ -44,7 +44,7 @@ class PaymentOption(models.Model):
         db_table = 'payment_options'
 
 class Card(models.Model):
-    payment_option   = models.ForeignKey(PaymentOption, on_delete = models.SET_NULL, null = True, related_name = cards)
+    payment_option   = models.ForeignKey(PaymentOption, on_delete = models.SET_NULL, null = True)
     card_number      = models.IntegerField()
     card_type        = models.CharField(max_length = 45)
     card_holder      = models.CharField(max_length = 100)
@@ -66,12 +66,13 @@ class Coupon(models.Model):
 class PackageType(models.Model):
     type  = models.CharField(max_length = 45)
     price = models.DecimalField(max_digits = 3, decimal_places = 2)
+
     class Meta:
         db_table = 'package_types'
 
 class WishList(models.Model):
-    product  = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True, related_names = wishlists)
-    user     = models.ForeignKey(User, on_delete = models.SET_NULL, null = True, related_name = wishlists)
+    product  = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
+    user     = models.ForeignKey(User, on_delete = models.SET_NULL, null = True)
     quantity = models.IntegerField()
 
     class Meta:
