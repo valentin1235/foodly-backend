@@ -61,7 +61,7 @@ class SignInView(View):
         try:
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
-                if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):  # 특정값을 가지고 와야한다.
+                if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
                     token = jwt.encode({'email': data['email']}, SECRET_KEY.values(),
                                        ALGORITHM).decode()
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
