@@ -5,12 +5,12 @@ import bcrypt
 
 from .models import User
 
-from django.views               import View
-from django.http                import HttpResponse, JsonResponse
-from django.core.validators     import validate_email
-from django.core.exceptions     import ValidationError
+from django.views import View
+from django.http import HttpResponse, JsonResponse
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
-from foodly_project.my_settings import SECRET_KEY , ALGORITHM
+from foodly_project.my_settings import SECRET_KEY, ALGORITHM
 
 
 # Create your views here.
@@ -52,8 +52,7 @@ class SignUpView(View):
         except ValidationError:
             return HttpResponse(status=401)
         except KeyError:
-            return HttpResponse(status=401)
-
+            return HttpResponse(status=400)
 
 
 class SignInView(View):
@@ -75,4 +74,3 @@ class SignInView(View):
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
-
