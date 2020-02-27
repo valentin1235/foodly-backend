@@ -47,7 +47,7 @@ class Address(models.Model):
 
 class Postcodes(models.Model):
     postcode = models.CharField(max_length=45)
-    discount_rate = models.DecimalField(max_digits=8, decimal_places=2, null=True)
+    shipping_cost = models.DecimalField(max_digits=8, decimal_places=2, null=True)
 
     class Meta:
         db_table = 'postcodes'
