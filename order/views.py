@@ -35,12 +35,15 @@ class WishListCreateView(View):
         signed_in_user = User.objects.get(id = 1)    # token_check_decorator가 완성되면 삭제할 코드
         saved_wishlist = WishList.objects.filter(user_id = signed_in_user)  # token_check_decorator가 완성되면, (user_id = request.user)
 
-        saved_items = []
+        saved_list = [
+            {
+                'name': item.product.name,
+                'price': item.product.price,
+                'thumbnail_url': item.product.thumbnail_url,
+                'quantity': item.quantity
+            } for item in saved_wishlist]
 
-        [saved_items.append({'name' : item.product.name, 'price' : item.product.price, 'thumbnail_url' : item.product.thumbnail_url, 'quantity' : item.quantity})
-         for item in saved_wishlist]
-
-        return JsonResponse({'wishlist': saved_items}, status=200)
+        return JsonResponse({'wishlist': saved_list}, status=200)
 
 #   @token_check_decorator
     def delete(self,request):
