@@ -27,6 +27,9 @@ class WishListCreateView(View):
         except WishList.DoesNotExist:
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
 
+        except KeyError:
+            return JsonResponse({'message': 'INVALID_KEY'}, status=400)
+
 #   @token_check_decorator
     def get(self, request):
         signed_in_user = User.objects.get(id = 1)    # token_check_decorator가 완성되면 삭제할 코드
