@@ -1,9 +1,10 @@
 import json
 import jwt
 
-from django.http                import JsonResponse
 from .models                    import User
 from foodly_project.my_settings import ALGORITHM, SECRET_KEY
+
+from django.http                import JsonResponse
 
 
 def login_check(func):
@@ -11,9 +12,11 @@ def login_check(func):
     def wrapper(self, request, *args, **kwargs):
 
         try:
+
             auth_token = request.headers.get('Authorization', None)
             payload = jwt.decode(auth_token, SECRET_KEY, ALGORITHM)
             request.user = User.objects.get(email=payload["email"])
+
             return func(self, request, *args, **kwargs)
 
         except User.DoesNotExist:
