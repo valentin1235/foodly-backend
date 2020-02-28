@@ -37,15 +37,8 @@ class WishListCreateView(View):
 
         saved_items = []
 
-        for item in saved_wishlist:
-            saved_items.append(
-                {
-                    'name'          : item.product.name,
-                    'price'         : item.product.price,
-                    'thumbnail_url' : item.product.thumbnail_url,
-                    'quantity'      : item.quantity
-                }
-            )
+        [saved_items.append({'name' : item.product.name, 'price' : item.product.price, 'thumbnail_url' : item.product.thumbnail_url, 'quantity' : item.quantity})
+         for item in saved_wishlist]
 
         return JsonResponse({'wishlist': saved_items}, status=200)
 
