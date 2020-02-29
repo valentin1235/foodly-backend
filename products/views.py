@@ -6,7 +6,6 @@ from django.http  import HttpResponse, JsonResponse
 
 from foodly_project.my_settings import SECRET_KEY
 from .models import Product
-#from .utils  import login_required
 
 class ProductView(View):
     def get(self, request):
@@ -22,4 +21,29 @@ class ProductView(View):
         )
         return JsonResponse({'data' : list(products_values)}, status = 200)
 
-
+class ProductDetailView(View):
+    def get(self, request, slug):
+        product_info = Product.objects.filter(name=slug).values(
+                'name', 
+                'harvest_year_id__year', 
+                'is_in_stock', 
+                'measure_id__measure', 
+                'description', 
+                'price', 
+                'small_image', 
+                'big_image', 
+                'energy', 
+                'carbonydrate', 
+                'protein', 
+                'fat', 
+                'mineral', 
+                'vitamin'
+        )
+        similar_product = Product.objects.filter(name=slug).values(
+                'similar_product__name', 
+                'similar_product__harvest_year_id__year', 
+                'similar_product__is_in_stock', 
+                'similar_product__measure_id__measure'
+        )
+        return JsonResponse({'data' : {'product_info' : list(product_info), 'similar_product' : list(similar_product)}}, status = 200)
+        

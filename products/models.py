@@ -12,7 +12,7 @@ class Product(models.Model):
     fat             = models.CharField(max_length = 10, null = True)
     mineral         = models.CharField(max_length = 100, null = True)
     vitamin         = models.CharField(max_length = 100, null = True)
-    is_in_stock     = models.BooleanField(default = True)
+    is_in_stock     = models.CharField(max_length = 30, null = True)
     is_on_sale      = models.BooleanField(default = False)
     harvest_year    = models.ForeignKey('HarvestYear', on_delete = models.SET_NULL, null = True)
     measure         = models.ForeignKey('Measure', on_delete = models.SET_NULL, null = True)
@@ -77,11 +77,11 @@ class ProductCategory(models.Model):
 class Recipe(models.Model):
     title          = models.CharField(max_length = 100, null = True)
     ingredient     = models.CharField(max_length = 2000, null = True)
-    direction      = models.TextField(null = True)
     thumbnail_url  = models.CharField(max_length = 2000, null = True)
     company        = models.CharField(max_length = 45, null = True)
     posting_date   = models.CharField(max_length = 45, null = True)
     author         = models.CharField(max_length = 100, null = True)
+    direction      = models.TextField(null = True)
     description    = models.TextField(null = True)
     is_main        = models.BooleanField(default = False)
     
