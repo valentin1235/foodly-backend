@@ -19,6 +19,7 @@ class Product(models.Model):
     recipe          = models.ForeignKey('Recipe', on_delete = models.SET_NULL, null = True)
     similar_product = models.ManyToManyField('self', through = 'SimilarProduct', symmetrical = False)
     bundle          = models.ManyToManyField('Bundle', through = 'ProductBundle')
+    category        = models.ManyToManyField('Category', through = 'ProductCategory')
     
     class Meta:
         db_table = 'products'
@@ -45,7 +46,7 @@ class SimilarProduct(models.Model):
 
 class Bundle(models.Model):
     title   = models.CharField(max_length = 100)
-    price   = models.DecimalField(max_digits = 10, decimal_places = 2)
+    price   = models.CharField(max_length = 50, null = True)
     is_main = models.BooleanField(default = False)
     
     class Meta:
@@ -58,12 +59,27 @@ class ProductBundle(models.Model):
     class Meta:
         db_table = 'product_bundles'
 
+class Category(models.Model):
+    name        = models.CharField(max_length = 50, null = True)
+    image_url   = models.CharField(max_length = 2000, null = True)
+    description = models.CharField(max_length = 2000, null = True)
+
+    class Meta:
+        db_table = 'categories'
+    
+class ProductCategory(models.Model):
+    product  = models.ForeignKey('Product', on_delete = models.CASCADE, null = True)
+    category = models.ForeignKey('Category', on_delete = models.CASCADE, null = True)
+
+    class Meta:
+        db_table = 'product_categories'
+
 class Recipe(models.Model):
-    title          = models.CharField(max_length = 100)
-    ingredient     = models.CharField(max_length = 2000)
+    title          = models.CharField(max_length = 100, null = True)
+    ingredient     = models.CharField(max_length = 2000, null = True)
     direction      = models.TextField(null = True)
-    thumbnail_url  = models.CharField(max_length = 2000)
-    company        = models.CharField(max_length = 45)
+    thumbnail_url  = models.CharField(max_length = 2000, null = True)
+    company        = models.CharField(max_length = 45, null = True)
     posting_date   = models.CharField(max_length = 45, null = True)
     author         = models.CharField(max_length = 100, null = True)
     description    = models.TextField(null = True)
