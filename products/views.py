@@ -23,7 +23,7 @@ class ProductView(View):
 
 class ProductDetailView(View):
     def get(self, request, slug):
-        product_info = Product.objects.filter(name=slug).values(
+        product_info = Product.objects.filter(name=slug).select_related('measure', 'harvest_year').values(
                 'name', 
                 'harvest_year_id__year', 
                 'is_in_stock', 
@@ -39,7 +39,7 @@ class ProductDetailView(View):
                 'mineral', 
                 'vitamin'
         )
-        similar_product = Product.objects.filter(name=slug).values(
+        similar_product = Product.objects.filter(name=slug).select_related('from_product', 'to_product').values(
                 'similar_product__name', 
                 'similar_product__harvest_year_id__year', 
                 'similar_product__is_in_stock', 
