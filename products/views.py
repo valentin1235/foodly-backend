@@ -5,7 +5,7 @@ from django.views import View
 from django.http  import HttpResponse, JsonResponse
 
 from foodly_project.my_settings import SECRET_KEY
-from .models import Product
+from .models import Product, Category, ProductCategory
 
 class ProductView(View):
     def get(self, request):
@@ -47,3 +47,17 @@ class ProductDetailView(View):
         )
         return JsonResponse({'data' : {'product_info' : list(product_info), 'similar_product' : list(similar_product)}}, status = 200)
         
+class ProductCategoryView(View):
+    def get(self, request, slug):
+        cached_field = Category.objects.filter(name=slug).prefetch_related(
+                'product',
+                'product__harevest_year',
+                'product__measure'
+        )
+        categorized_page = cached_field.values(
+                'product__name',
+                'product__harvest_year_id__year', 
+                'product__is_in_stock', 
+                'product__measure_id__measure'
+        )
+        return JsonResponse({'data' : list(categorized_page)}, status = 200)
