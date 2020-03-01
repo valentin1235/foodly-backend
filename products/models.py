@@ -45,9 +45,9 @@ class SimilarProduct(models.Model):
         db_table        = 'similar_products'
 
 class Bundle(models.Model):
-    title   = models.CharField(max_length = 100)
-    price   = models.CharField(max_length = 50, null = True)
-    is_main = models.BooleanField(default = False)
+    title           = models.CharField(max_length = 100)
+    price           = models.CharField(max_length = 50, null = True)
+    is_in_promotion = models.BooleanField(default = False)
     
     class Meta:
         db_table = 'bundles'
