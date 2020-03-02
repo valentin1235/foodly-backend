@@ -10,7 +10,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from foodly_project.my_settings import SECRET_KEY, ALGORITHM
+from foodly_project.my_settings import SECRET_KEY, Algorithm
 
 
 # Create your views here.
@@ -27,6 +27,10 @@ class SignUpView(View):
         try:
             data = json.loads(request.body)
             validate_email(data['email'])
+
+            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
+                'password'] is None:
+                return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
             if User.objects.filter(email=data['email']).exists():
                 return HttpResponse(status=400)
@@ -65,8 +69,8 @@ class SignInView(View):
                 user = User.objects.get(email=data['email'])
 
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
-                    token = jwt.encode({'email': data['email']}, SECRET_KEY.values(),
-                                       ALGORITHM).decode()
+                    token = jwt.encode({'email': data['email']}, SECRET_KEY['secret'],
+                                       algorithm=Algorithm).decode()
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
 
                 return HttpResponse(status=401)
