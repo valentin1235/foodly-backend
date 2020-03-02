@@ -12,7 +12,7 @@ from django.http import HttpResponse, JsonResponse
 from account.utils import login_check
 
 
-class ReviewView(View):
+class ReviewCreateView(View):
     def get(self, request):  # read
         review_list = Review.objects.all()
         return JsonResponse({"review": list(review_list)}, status=200)
@@ -37,10 +37,26 @@ class ReviewView(View):
         except User.DoesNotExist:
             return HttpResponse(status=400)
 
+    def get(self, request):
+        review_data = Review.objects.all()
+        return JsonResponse({'review': list(review_data)}, status=200)
+
+
+class ReviewUpdateView(View):
     @login_check
-    def delete(self, request):  # delete
-        user_id = request.user.id
-        data = Review.objects.get(user_id=user_id)
-        data.delete()
-        review = Review.objects.all()
-        return JsonResponse({'message': list(review)}, status=200)
+    def post(self, request):
+        return
+
+    def get(self, request):
+        review_data = Review.objects.all()
+        return JsonResponse({'review': list(review_data)}, status=200)
+
+
+class ReviewDeleteView(View):
+    @login_check
+    def post(self, request):
+        return
+
+    def get(self, request):
+        review_data = Review.objects.all()
+        return JsonResponse({'review': list(review_data)}, status=200)
