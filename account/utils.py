@@ -2,7 +2,7 @@ import json
 import jwt
 
 from .models import User
-from foodly_project.my_settings import Algorithm, SECRET_KEY
+from foodly_project.my_settings import ALGORITHM, SECRET_KEY
 
 from django.http import JsonResponse
 
@@ -13,7 +13,7 @@ def login_check(func):
         try:
 
             auth_token = request.headers.get('Authorization', None)
-            payload = jwt.decode(auth_token, SECRET_KEY, Algorithm)
+            payload = jwt.decode(auth_token, SECRET_KEY['secret'], algorithms=ALGORITHM)
             user = User.objects.get(id=payload["id"])
             request.user = user
 
