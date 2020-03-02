@@ -74,6 +74,12 @@ class ProductCategory(models.Model):
     class Meta:
         db_table = 'product_categories'
 
+class Sort(models.Model):
+    keyword = models.CharField(max_length = 100, null = True)
+
+    class Meta:
+        db_table = 'sorts'
+
 class Recipe(models.Model):
     title          = models.CharField(max_length = 100, null = True)
     ingredient     = models.CharField(max_length = 2000, null = True)
@@ -102,9 +108,11 @@ class RecipeKeyword(models.Model):
         db_table = 'recipe_keywords'
 
 class Recommendation(models.Model):
-    title       = models.CharField(max_length = 100)
-    description = models.CharField(max_length = 1000)
-    
+    title         = models.CharField(max_length = 100)
+    description   = models.CharField(max_length = 1000)
+    recipe        = models.ManyToManyField('Recipe', through = 'RecipeRecommendation')
+    is_on_display = models.BooleanField(default = True)
+
     class Meta:
         db_table = 'recommendations'
 
