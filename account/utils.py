@@ -1,4 +1,3 @@
-import json
 import jwt
 
 from .models                    import User
