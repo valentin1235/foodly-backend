@@ -10,7 +10,7 @@ from django.http import HttpResponse, JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from foodly_project.my_settings import SECRET_KEY, Algorithm
+from foodly_project.my_settings import SECRET_KEY, ALGORITHM
 
 
 # Create your views here.
