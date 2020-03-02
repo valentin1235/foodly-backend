@@ -1,26 +1,24 @@
 import json
 
-from .models        import Order, Cart, PaymentOption, Card, Coupon, PackageType, BillingAddress, WishList
+from .models         import Order, Cart, WishList
 from products.models import Product
-from user.models    import User
+from user.models     import User
 
-from django.views import View
-from django.http  import HttpResponse,JsonResponse
+from django.views    import View
+from django.http     import HttpResponse,JsonResponse
 
 
 class WishListCreateView(View):
 #    @token_check_decorator
     def post(self, request):
-
         try:
             wishlist_data = json.loads(request.body)
-            wishlist_user = User.objects.get(email = wishlist_data['email'])        # token_check_decorator가 완성되면, (email = request.user)
+            wishlist_user = User.objects.get(email = wishlist_data['email']) # token_check_decorator가 완성되면, (email = request.user)
             new_item      = Product.objects.get(name = wishlist_data['product'])
 
             if Product.objects.filter(name = wishlist_data['product'], is_in_stock = True).exists():
                 WishList.objects.create(product = new_item, user = wishlist_user, quantity = wishlist_data['quantity'])
                 return JsonResponse({'message': 'SUCCESS'}, status=200)
-
             else:
                 return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
@@ -32,15 +30,15 @@ class WishListCreateView(View):
 
 #   @token_check_decorator
     def get(self, request):
-        signed_in_user = User.objects.get(id = 1)    # token_check_decorator가 완성되면 삭제할 코드
+        signed_in_user = User.objects.get(id = 1) # token_check_decorator가 완성되면 삭제할 코드
         saved_wishlist = WishList.objects.filter(user_id = signed_in_user)  # token_check_decorator가 완성되면, (user_id = request.user)
 
         saved_list = [
             {
-                'name': item.product.name,
-                'price': item.product.price,
-                'thumbnail_url': item.product.thumbnail_url,
-                'quantity': item.quantity
+                'name'          : item.product.name,
+                'price'         : item.product.price,
+                'thumbnail_url' : item.product.thumbnail_url,
+                'quantity'      : item.quantity
             } for item in saved_wishlist]
 
         return JsonResponse({'wishlist': saved_list}, status=200)
@@ -82,10 +80,10 @@ class CartView(View):
                
                 new_order = Order.objects.create(user = order_user)
                 Cart.objects.create(
-                    user = order_user,
-                    order = new_order,
+                    user       = order_user,
+                    order      = new_order,
                     product_id = order_data['id'],
-                    quantity = order_data['quantity']
+                    quantity   = order_data['quantity']
                 )
                 return JsonResponse({'message': 'ORDER_CREATED'}, status=200)
             
