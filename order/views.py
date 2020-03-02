@@ -51,11 +51,8 @@ class WishListCreateView(View):
 
         if WishList.objects.filter(id=data['id']).exists():
             WishList.objects.get(id=data['id']).delete()
-
             return JsonResponse({"message": "SUCCESS"}, status=200)
-
-        else:
-            return JsonResponse({"message": "INVALID_INPUT"}, status=200)
+        return JsonResponse({"message": "INVALID_INPUT"}, status=200)
 
 class CartView(View):
 #    @token_check_decorator
@@ -63,46 +60,36 @@ class CartView(View):
         try:
             order_data   = json.loads(request.body)
             order_user   = User.objects.get(email = order_data['email']) # token_check_decorator가 완성되면, (email = request.user)
+            product      = Product.objects.filter(id=order_data['id'], is_in_stock=True)
+            cart         = Cart.objects.filter(user_id = order_user.id, product_id = order_data['id'])
+            order        = Order.objects.filter(user = order_user)
 
-            if Product.objects.filter(id=order_data['id'], is_in_stock=True).exists():  #상품의 재고가 있으면,
-                if Order.objects.filter(user = order_user).exists():    #오더가 존재하면,
-                    if Cart.objects.filter(user_id = order_user.id, product_id = order_data['id']).exists(): #카트에 상품이 존재하면, 카트의 qty를 업데이트
-                        cart_to_update = Cart.objects.get(product_id=order_data["id"])
-
-                        qty_new = int(order_data['quantity'])
-                        qty_old = cart_to_update.quantity
-                        qty_updated = qty_new + qty_old
-
-                        cart_to_update.quantity = qty_updated
+            if product.exists():
+                if order.exists():
+                    if cart.exists():
+                        cart_to_update = cart.get(product_id=order_data["id"])
+                        cart_to_update.quantity = int(order_data['quantity']) + cart_to_update.quantity
                         cart_to_update.save()
-
                         return JsonResponse({'message' : 'CART_ADDED'}, status=200)
-
-                    else:  #카트에 상품이 존재하지 않으면, 새로운 카트를 만듬
-                        existing_order = Order.objects.get(user=order_user)
-
-                        Cart.objects.create(
-                             user=order_user,
-                             order=existing_order,
-                             product_id=order_data['id'],
-                             quantity=order_data['quantity']
-                        )
-
-                    return JsonResponse({'message': 'CART_CREATED'}, status=200)
-
-                else:# 오더가 존재하지 않으면
-                    new_order = Order.objects.create(user = order_user)
-
+                    
                     Cart.objects.create(
-                                        user = order_user,
-                                        order = new_order,
-                                        product_id = order_data['id'],
-                                        quantity = order_data['quantity']
+                        user       = order_user,
+                        order      = order.get(user=order_user),
+                        product_id = order_data['id'],
+                        quantity   = order_data['quantity']
                     )
-
-                    return JsonResponse({'message': 'ORDER_CREATED'}, status=200)
-            else: #해당 상품의 재고가 없는 경우
-                return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
+                    return JsonResponse({'message': 'CART_CREATED'}, status=200)
+               
+                new_order = Order.objects.create(user = order_user)
+                Cart.objects.create(
+                    user = order_user,
+                    order = new_order,
+                    product_id = order_data['id'],
+                    quantity = order_data['quantity']
+                )
+                return JsonResponse({'message': 'ORDER_CREATED'}, status=200)
+            
+            return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
