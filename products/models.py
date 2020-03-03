@@ -2,10 +2,12 @@ from django.db import models
 
 class Product(models.Model):
     name            = models.CharField(max_length = 45, unique = True)
-    price           = models.CharField(max_length = 50, null = True)
+    price           = models.DecimalField(max_digits = 10, decimal_places=2, null = True)
     description     = models.CharField(max_length = 1000, null = True)
     small_image     = models.CharField(max_length = 2000, null = True)
-    big_image       = models.CharField(max_length = 2000, null = True)
+    big_image1      = models.CharField(max_length = 2000, null = True)
+    big_image2      = models.CharField(max_length = 2000, null = True)
+    big_image3      = models.CharField(max_length = 2000, null = True)
     energy          = models.CharField(max_length = 10, null = True)
     carbonydrate    = models.CharField(max_length = 10, null = True)
     protein         = models.CharField(max_length = 10, null = True)
