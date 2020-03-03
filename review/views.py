@@ -8,7 +8,7 @@ from django.http import HttpResponse, JsonResponse
 from account.utils import login_check
 
 
-class ReviewCreateView(View):
+class ReviewView(View):
     @login_check
     def post(self, request, product_name):  # create
         data = json.loads(request.body)
@@ -44,7 +44,7 @@ class ReviewCreateView(View):
             return JsonResponse({"message": 'INVALD_PRODUCT'}, status=400)
 
 
-class ReviewUpdateView(View):
+class ReviewDetailView(View):
     @login_check
     def post(self, request, product_name, review_id):
         data = json.loads(request.body)
