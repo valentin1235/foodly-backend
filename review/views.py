@@ -24,25 +24,13 @@ class ReviewView(View):
                     ).save()
                     return JsonResponse({'message': "SUCCESS"}, status=200)
 
-        except KeyError:
-            return HttpResponse(status=400)
-
         except User.DoesNotExist:
             return HttpResponse(status=400)
 
     @login_check
     def get(self, request, product_name):
-
-        try:
-            if Product.objects.filter(name=product_name).exists():
-                product_id = Product.objects.get(name=product_name).id
-                review_data = Review.objects.filter(product_id=product_id).values()
-                return JsonResponse({"message": f"{review_data}"}, status=200)
-            else:
-                return JsonResponse({"message": "INVALID_PRODUCT"}, status=400)
-
-        except KeyError:
-            return HttpResponse(status=400)
+        review_data = list(Review.objects.filter(product__name=product_name).values())
+        return JsonResponse({"message": f"{review_data}"}, status=200)
 
 
 class ReviewDetailView(View):

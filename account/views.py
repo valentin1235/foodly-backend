@@ -3,7 +3,7 @@ import jwt
 import re
 import bcrypt
 
-from .models import User
+from .models import User, Address
 
 from django.views import View
 from django.http import HttpResponse, JsonResponse
@@ -11,6 +11,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
 from foodly_project.my_settings import SECRET_KEY, ALGORITHM
+from .utils import login_check
 
 
 # Create your views here.
@@ -27,6 +28,11 @@ class SignUpView(View):
         try:
             data = json.loads(request.body)
             validate_email(data['email'])
+            print('data : ', data)
+
+            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
+                'password'] is None:
+                return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
             if User.objects.filter(email=data['email']).exists():
                 return HttpResponse(status=400)
@@ -50,11 +56,16 @@ class SignUpView(View):
                 password=bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             ).save()
 
+            return JsonResponse({"message": "success"}, status=200)
+
         except ValidationError:
             return HttpResponse(status=400)
 
         except KeyError:
             return HttpResponse(status=400)
+
+    def get(self, request):
+        return JsonResponse({"message": "회원가입페이지"}, status=200)
 
 
 class SignInView(View):
@@ -63,10 +74,10 @@ class SignInView(View):
         try:
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
-
+                # "Authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Impha2R1MUBnbWFpbC5jb20ifQ.rZosUSdymxyO1wU4Kg1P0gdbK8MndsUyapSCoxMDaF0"
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
-                    token = jwt.encode({'email': data['email']}, SECRET_KEY.values(),
-                                       ALGORITHM).decode()
+                    token = jwt.encode({'id': User.objects.get(email=data['email']).id}, SECRET_KEY['secret'],
+                                       algorithm=ALGORITHM).decode()
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
 
                 return HttpResponse(status=401)
@@ -78,3 +89,41 @@ class SignInView(View):
 
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+
+class AddressCreateView(View):
+    @login_check
+    def post(self, request):
+        address_data = json.loads(request.body)
+        print(address_data)
+        return
+
+    def get(self, request):
+        address_data = Address.objects.all()
+        return JsonResponse({"message": list(address_data)}, status=200)
+
+
+class AddressUpdateView(View):
+    @login_check
+    def post(self, request, address_id):
+        address_data = json.loads(request.body)
+        print(address_data)
+
+        if address_data['first_name'] is None \
+                or address_data['last_name'] is None \
+                or address_data['address1'] is None \
+                or address_data['city'] is None \
+                or address_data['country'] is None:
+            return JsonResponse({"message": "INVALD_DATA"}, status=400)
+
+        if find_special(address_data['first_name']) or find_special(address_data['last_name']):
+            return HttpResponse(status=400)
+
+        Address(
+
+        ).save()
+
+        return JsonResponse({"message": "SUCCESS"}, status=200)
+
+    def delete(self, request, address_id):
+        return
