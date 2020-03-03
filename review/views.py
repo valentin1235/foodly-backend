@@ -44,9 +44,6 @@ class ReviewView(View):
         except KeyError:
             return HttpResponse(status=400)
 
-        except Product.DoesNotExist:
-            return JsonResponse({"message": 'INVALID_PRODUCT'}, status=400)
-
 
 class ReviewDetailView(View):
     @login_check
