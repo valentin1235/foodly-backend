@@ -23,41 +23,32 @@ class ProductView(View):
 
         if sort_by:
             sort = product_info.order_by(sort_by)
-            return JsonResponse({'data' : list(sort)}, status = 200)
-        
+            return JsonResponse({'data' : list(sort)}, status = 200) 
         return JsonResponse({'data' : list(product_info)}, status = 200)
 
 class ProductDetailView(View):
     def get(self, request, product_id):
-        data_caching = Product.objects.filter(id=product_id).select_related('measure', 'harvest_year').prefetch_related('similar_product')
-        
-        product_info = data_caching.values(
-                'name', 
-                'harvest_year_id__year', 
-                'is_in_stock', 
-                'measure_id__measure', 
-                'description', 
-                'price', 
-                'small_image', 
-                'big_image1', 
-                'big_image2',
-                'big_image3',
-                'energy', 
-                'carbonydrate', 
-                'protein', 
-                'fat', 
-                'mineral', 
-                'vitamin',
-        )
-        similar_product = data_caching[0].similar_product.values(
-                'name', 
-                'harvest_year_id__year', 
-                'is_in_stock', 
-                'measure_id__measure'
-        )
-        list(product_info)[0]['similar_product'] = list(similar_product)
-
-        return JsonResponse({'data' : list(product_info)}, status = 200)
+        data_caching = Product.objects.select_related('measure', 'harvest_year').prefetch_related('similar_product').get(id=product_id)
+        product_info = {
+                'name'                  : data_caching.name,
+                'harvest_year_id__year' : data_caching.harvest_year.year,
+                'measure_id__measure'   : data_caching.measure.measure,
+                'is_in_stock'           : data_caching.is_in_stock,
+                'description'           : data_caching.description, 
+                'price'                 : data_caching.price, 
+                'small_image'           : data_caching.small_image, 
+                'big_image1'            : data_caching.big_image1, 
+                'big_image2'            : data_caching.big_image2,
+                'big_image3'            : data_caching.big_image3,
+                'energy'                : data_caching.energy, 
+                'carbonydrate'          : data_caching.carbonydrate, 
+                'protein'               : data_caching.protein, 
+                'fat'                   : data_caching.fat, 
+                'mineral'               : data_caching.mineral, 
+                'vitamin'               : data_caching.vitamin,
+                'similar_product'       : list(data_caching.similar_product.values('name', 'harvest_year_id__year', 'is_in_stock', 'measure_id__measure'))
+                }
+        return JsonResponse({'data' : product_info}, status = 200)
         
 class ProductCategoryView(View):
     def get(self, request, category_name):
@@ -76,7 +67,6 @@ class ProductCategoryView(View):
         if sort_by:
             sort = categorized_page.order_by(sort_by)
             return JsonResponse({'data' : list(sort)}, status = 200)
-
         return JsonResponse({'data' : list(categorized_page)}, status = 200)
 
 class RecipeView(View):
@@ -107,10 +97,9 @@ class BundleView(View):
     def get(self, request):
         data_caching = Bundle.objects.prefetch_related('product_set')
         bundle_info  = data_caching.values('title', 'price', 'is_in_promotion')
-        content_info = [data_caching[i].product_set.values('measure_id__measure', 'name').annotate(Count('name')) for i in range(0,len(data_caching))]
-        for i in range(0,len(bundle_info)):
-            list(bundle_info)[i]['content'] = list(content_info[i])
-        return JsonResponse({'data' :  list(bundle_info)}, status = 200)
+        content_info = [list(data.product_set.values('measure_id__measure', 'name').annotate(Count('name'))) for data in data_caching]
+        bundle=[data for data in zip(bundle_info, content_info)]
+        return JsonResponse({'data' :  bundle}, status = 200)
 
 
 

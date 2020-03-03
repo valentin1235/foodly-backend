@@ -16,9 +16,12 @@ class Product(models.Model):
     vitamin         = models.CharField(max_length = 100, null = True)
     is_in_stock     = models.CharField(max_length = 30, null = True)
     is_on_sale      = models.BooleanField(default = False)
+    discount_rate   = models.CharField(max_length = 50, null = True)
+    is_main         = models.BooleanField(default = False)
     harvest_year    = models.ForeignKey('HarvestYear', on_delete = models.SET_NULL, null = True)
     measure         = models.ForeignKey('Measure', on_delete = models.SET_NULL, null = True)
     recipe          = models.ForeignKey('Recipe', on_delete = models.SET_NULL, null = True)
+    season          = models.ForeignKey('Season', on_delete = models.SET_NULL, null = True)
     similar_product = models.ManyToManyField('self', through = 'SimilarProduct', symmetrical = False)
     bundle          = models.ManyToManyField('Bundle', through = 'ProductBundle')
     category        = models.ManyToManyField('Category', through = 'ProductCategory')
@@ -37,6 +40,9 @@ class Measure(models.Model):
     
     class Meta:
         db_table = 'measures'
+
+class Season(models.Model):
+    name = models.CharField(max_length = 50)
 
 class SimilarProduct(models.Model):
     from_product = models.ForeignKey('Product', on_delete = models.SET_NULL, null = True, related_name = 'from_product')
