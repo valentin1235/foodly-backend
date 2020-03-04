@@ -1,4 +1,4 @@
-import json
+import json , requests
 import jwt
 import re
 import bcrypt
@@ -127,3 +127,19 @@ class AddressUpdateView(View):
 
     def delete(self, request, address_id):
         return
+
+class KakaoLoginView(View):
+    def get(self,request):
+        try:
+            data = request.GET.get('Authorization' , None)
+            print(data)
+            if data :
+                api_key ='55c0f58206b61a1d088d119aaed7e553'
+                redirect_uri = 'http://localhost:8000'
+                response_return= f'/oauth/authorize?client_id={api_key}&redirect_uri={redirect_uri}&response_type={data}'
+                return JsonResponse({'message':f'{response_return}'},status=200)
+        except :
+            return HttpResponse(status=400)
+
+
+
