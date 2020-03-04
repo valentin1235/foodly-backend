@@ -34,6 +34,10 @@ class SignUpView(View):
                 'password'] is None:
                 return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
+            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
+                'password'] is None:
+                return JsonResponse({'message': 'NOT_VALID'}, status=400)
+
             if User.objects.filter(email=data['email']).exists():
                 return HttpResponse(status=400)
 
@@ -74,9 +78,8 @@ class SignInView(View):
         try:
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
-                # "Authorization": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6Impha2R1MUBnbWFpbC5jb20ifQ.rZosUSdymxyO1wU4Kg1P0gdbK8MndsUyapSCoxMDaF0"
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
-                    token = jwt.encode({'id': User.objects.get(email=data['email']).id}, SECRET_KEY['secret'],
+                    token = jwt.encode({'email': data['email']}, SECRET_KEY['secret'],
                                        algorithm=ALGORITHM).decode()
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
 
