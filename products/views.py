@@ -6,7 +6,7 @@ from django.views import View
 from django.http import HttpResponse, JsonResponse
 
 from foodly_project.my_settings import SECRET_KEY
-from .models import Product
+from .models import Product, Recipe
 
 
 # from recipes.models import Recipes
@@ -32,10 +32,13 @@ class SearchView(View):
 
     def get(self, request):
         data = request.GET.get('search', None)
-        print('search_data', data)
-        if len(data) > 2:
-            # recipe_data = list(Recipes.objects.values().filter(Q(title__icontains=data))) 아직 레시피앱이 없는관계로...
-            product_data = list(Product.objects.values().filter(Q(name__icontains=data)))
-            # return JsonResponse({"SUCCESS": recipe_data +product_data}, status=200)
 
-        return HttpResponse(status=400)
+        try:
+            if len(data) > 2:
+                recipe_data = list(Recipe.objects.values().filter(Q(title__icontains=data)))
+                product_data = list(Product.objects.values().filter(Q(name__icontains=data)))
+                return JsonResponse({"SUCCESS": f'recipe_data : {recipe_data} + product_data : {product_data}'},
+                                    status=200)
+
+        except:
+            return HttpResponse(status=400)
