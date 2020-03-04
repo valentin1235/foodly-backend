@@ -108,29 +108,24 @@ class OrderView(View):
     @login_check
     def get(self,request):
         saved_order = Order.objects.get(user_id=request.user, is_closed=False)
-        cart = Order.objects.filter(user_id=request.user, is_closed=False).prefetch_related('cart_set')[0].cart_set.all()
+        cart        = saved_order.cart_set.all()
 
         saved_cart = [
             {
-                'name': cart[i].product.name,
-                'price': cart[i].product.price,
-                'thumbnail_url': cart[i].product.thumbnail_url,
-                'quantity': cart[i].quantity
-            } for i in range(len(cart))
+                'name': prop.product.name,
+                'price': prop.product.price,
+                'thumbnail_url': prop.product.thumbnail_url,
+                'quantity': prop.quantity
+            } for prop in cart
         ]
+        total_q    = sum(item['quantity'] for item in saved_cart)
+        total_p    = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
-        total_q = sum(item['quantity'] for item in saved_cart)
-        total_p = Cart.objects.annotate(ttl=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
-
-        totals = 0
-        i = 0
-        while(i < len(total_p)):
-            totals += total_p[i].ttl
-            i += 1
-
-        sub_total = totals + saved_order.package_type.price
-        saved_order.total_price = sub_total
+        base = 0
+        for each_p in total_p:
+            base += each_p.price
+        saved_order.total_price = base + saved_order.package_type.price
         saved_order.save()
 
-        res = [saved_cart, total_q, saved_order.total_price]
+        res = [saved_cart, {"total_quantity" : total_q}, {"total_price" : saved_order.total_price}]
         return JsonResponse({'cart': res}, status=200)
