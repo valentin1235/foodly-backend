@@ -11,8 +11,11 @@ from .models                    import Product, Category, ProductCategory, Recip
 class ProductView(View):
     def get(self, request, *args, **kwargs):
         sort_by = request.GET.get('sort_by', None)
-        product_info = Product.objects.select_related('harvest_year', 'measure').values(
+        start   = request.GET.get('start', None)
+        end     = request.GET.get('end', None)
+        product_info = Product.objects.select_related('harvest_year', 'measure').order_by('id').values(
                 'name',
+                'id',
                 'price',
                 'small_image',
                 'harvest_year__year',
@@ -20,12 +23,17 @@ class ProductView(View):
                 'is_on_sale',
                 'is_in_stock',
         )
+        
+        if start and end:
+            paged_product = product_info[int(start):int(end)]
+
+            return JsonResponse({'data' : list(paged_product)}, status = 200)            
 
         if sort_by:
-            sort = product_info.order_by(sort_by)
-            
-            return JsonResponse({'data' : list(sort)}, status = 200) 
-        
+            sorted_product = product_info.order_by(sort_by)
+
+            return JsonResponse({'data' : list(sorted_product)}, status = 200)
+
         return JsonResponse({'data' : list(product_info)}, status = 200)
 
 class ProductDetailView(View):
@@ -56,6 +64,8 @@ class ProductDetailView(View):
 class ProductCategoryView(View):
     def get(self, request, category_name):
         sort_by = request.GET.get('sort_by', None)
+        start   = request.GET.get('start', None)
+        end     = request.GET.get('end', None)        
         category_filter = Product.objects.filter(category__name = category_name).prefetch_related('harvest_year', 'measure')
         categorized_page = category_filter.values(
                 'name',
@@ -66,6 +76,11 @@ class ProductCategoryView(View):
                 'is_on_sale',
                 'is_in_stock',
         )
+
+        if start and end:
+            paged_product = categorized_page[int(start):int(end)]
+
+            return JsonResponse({'data' : list(paged_product)}, status = 200)
 
         if sort_by:
             sort = categorized_page.order_by(sort_by)
