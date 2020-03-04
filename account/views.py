@@ -24,6 +24,7 @@ def find_space(string):
 
 
 class SignUpView(View):
+
     def post(self, request):
         try:
             data = json.loads(request.body)
@@ -73,6 +74,7 @@ class SignUpView(View):
 
 
 class SignInView(View):
+    @login_check
     def post(self, request):
         data = json.loads(request.body)
         try:
@@ -92,41 +94,3 @@ class SignInView(View):
 
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
-
-
-class AddressCreateView(View):
-    @login_check
-    def post(self, request):
-        address_data = json.loads(request.body)
-        print(address_data)
-        return
-
-    def get(self, request):
-        address_data = Address.objects.all()
-        return JsonResponse({"message": list(address_data)}, status=200)
-
-
-class AddressUpdateView(View):
-    @login_check
-    def post(self, request, address_id):
-        address_data = json.loads(request.body)
-        print(address_data)
-
-        if address_data['first_name'] is None \
-                or address_data['last_name'] is None \
-                or address_data['address1'] is None \
-                or address_data['city'] is None \
-                or address_data['country'] is None:
-            return JsonResponse({"message": "INVALD_DATA"}, status=400)
-
-        if find_special(address_data['first_name']) or find_special(address_data['last_name']):
-            return HttpResponse(status=400)
-
-        Address(
-
-        ).save()
-
-        return JsonResponse({"message": "SUCCESS"}, status=200)
-
-    def delete(self, request, address_id):
-        return
