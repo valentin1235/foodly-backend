@@ -19,6 +19,8 @@ from .views import HomeView
 
 urlpatterns = [
     path('products', include('products.urls')),
+    path('review', include('review.urls')),
+    path('account', include('account.urls')),
     path('', HomeView.as_view()),
     path('order', include('order.urls')),
 ]
