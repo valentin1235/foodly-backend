@@ -1,4 +1,4 @@
-import json , requests
+import json, requests
 import jwt
 import re
 import bcrypt
@@ -23,11 +23,16 @@ def find_space(string):
 
 
 class SignUpView(View):
+
     def post(self, request):
         try:
             data = json.loads(request.body)
             validate_email(data['email'])
             print('data : ', data)
+
+            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
+                'password'] is None:
+                return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
             if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
                 'password'] is None:
@@ -68,13 +73,14 @@ class SignUpView(View):
 
 
 class SignInView(View):
+    @login_check
     def post(self, request):
         data = json.loads(request.body)
         try:
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
-                    token = jwt.encode({'id': User.objects.get(email=data['email']).id}, SECRET_KEY['secret'],
+                    token = jwt.encode({'email': data['email']}, SECRET_KEY['secret'],
                                        algorithm=ALGORITHM).decode()
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
 
@@ -126,18 +132,16 @@ class AddressUpdateView(View):
     def delete(self, request, address_id):
         return
 
+
 class KakaoLoginView(View):
-    def get(self,request):
+    def get(self, request):
         try:
-            data = request.GET.get('Authorization' , None)
+            data = request.GET.get('Authorization', None)
             print(data)
-            if data :
-                api_key ='55c0f58206b61a1d088d119aaed7e553'
+            if data:
+                api_key = '55c0f58206b61a1d088d119aaed7e553'
                 redirect_uri = 'http://localhost:8000'
-                response_return= f'/oauth/authorize?client_id={api_key}&redirect_uri={redirect_uri}&response_type={data}'
-                return JsonResponse({'message':f'{response_return}'},status=200)
-        except :
+                response_return = f'/oauth/authorize?client_id={api_key}&redirect_uri={redirect_uri}&response_type={data}'
+                return JsonResponse({'message': f'{response_return}'}, status=200)
+        except:
             return HttpResponse(status=400)
-
-
-

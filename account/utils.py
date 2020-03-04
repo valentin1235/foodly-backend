@@ -12,11 +12,11 @@ def login_check(func):
         try:
 
             auth_token = request.headers.get('Authorization', None)
+            print(auth_token)
             payload = jwt.decode(auth_token, SECRET_KEY['secret'], algorithms=ALGORITHM)
-            print('payload : ', payload)
-            request.user = User.objects.get(id=payload["id"])
-            print('request.user : ', request.user.id)
-
+            print(payload)
+            user = User.objects.get(id=payload["id"])
+            request.user = user
             return func(self, request, *args, **kwargs)
 
         except User.DoesNotExist:
