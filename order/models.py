@@ -1,14 +1,20 @@
-from user.models import User
-from product.models import Product
+import uuid
+
+from account.models import User
+from products.models import Product
 
 from django.db import models
 
 class Order(models.Model):
-    user            = models.ForeignKey(User, on_delete = models.SET_NULL, null = True)
-    payment_option  = models.ForeignKey("PaymentOption", on_delete = models.SET_NULL, null = True)
-    coupon          = models.ForeignKey("Coupon", on_delete = models.SET_NULL, null = True)
-    billing_address = models.ForeignKey("BillingAddress", on_delete = models.SET_NULL, null = True)
-    created_at      = models.DateTimeField(auto_now_add = True)
+    id               = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, unique = True)
+    user             = models.ForeignKey(User, on_delete = models.SET_NULL, null = True)
+    package_type     = models.ForeignKey("PackageType", default = 1, on_delete = models.CASCADE)
+    payment_option   = models.ForeignKey("PaymentOption", on_delete = models.SET_NULL, null = True)
+    coupon           = models.ForeignKey("Coupon", on_delete = models.SET_NULL, null = True)
+    billing_address  = models.ForeignKey("BillingAddress", on_delete = models.SET_NULL, null = True)
+    created_at       = models.DateTimeField(auto_now_add = True)
+    total_price      = models.DecimalField(max_digits = 10, decimal_places = 2, null = True)
+    is_closed        = models.BooleanField(default = False)
 
     class Meta:
         db_table = 'orders'
@@ -17,7 +23,6 @@ class Cart(models.Model):
     user         = models.ForeignKey(User, on_delete = models.SET_NULL, null = True)
     order        = models.ForeignKey(Order, on_delete = models.SET_NULL, null = True)
     product      = models.ForeignKey(Product, on_delete = models.SET_NULL, null = True)
-    package_type = models.ForeignKey("PackageType", on_delete = models.SET_NULL, null = True)
     quantity     = models.IntegerField()
 
     class Meta:
@@ -57,8 +62,8 @@ class Card(models.Model):
         db_table = 'cards'
 
 class Coupon(models.Model):
-    discount_code = models.CharField(max_length = 45)
-    discount_rate = models.DecimalField(max_digits = 3, decimal_places = 2)
+    discount_code = models.CharField(max_length = 45, null = True)
+    discount_rate = models.DecimalField(max_digits = 3, decimal_places = 2, null = True)
 
     class Meta:
         db_table = 'coupons'
@@ -77,4 +82,3 @@ class WishList(models.Model):
 
     class Meta:
         db_table = 'wishlists'
-
