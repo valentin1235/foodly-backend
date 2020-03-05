@@ -1,4 +1,3 @@
-import json
 import jwt
 
 from .models import User
@@ -16,7 +15,6 @@ def login_check(func):
             payload = jwt.decode(auth_token, SECRET_KEY['secret'], algorithms=ALGORITHM)
             user = User.objects.get(id=payload["id"])
             request.user = user
-
             return func(self, request, *args, **kwargs)
 
         except User.DoesNotExist:

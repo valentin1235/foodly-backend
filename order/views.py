@@ -1,13 +1,13 @@
 import json
 
-from .models           import Order, Cart, PaymentOption, Coupon, PackageType, BillingAddress, WishList
-from products.models   import Product
-from account.models    import User
-from account.utils     import login_check
+from .models          import Order, Cart, PackageType, WishList
+from products.models  import Product
+from account.models   import User
+from account.utils    import login_check
 
-from django.views      import View
-from django.http       import HttpResponse,JsonResponse
-from django.db.models  import F, ExpressionWrapper, DecimalField
+from django.views     import View
+from django.http      import HttpResponse, JsonResponse
+from django.db.models import F, ExpressionWrapper, DecimalField
 
 class WishListView(View):
     @login_check
@@ -45,7 +45,7 @@ class WishListView(View):
         return JsonResponse({'wishlist': saved_list}, status=200)
 
     @login_check
-    def delete(self,request):
+    def delete(self, request):
         data = json.loads(request.body)
         wishlist = WishList.objects.filter(user_id=request.user, product_id=data['id'])
 
@@ -81,16 +81,18 @@ class CartView(View):
                 Cart.objects.create(
                     user=request.user,
                     order=Order.objects.create(user=request.user),
+
                     product_id=data['id'],
                     quantity=data['quantity']
                 )
                 return JsonResponse({'message': 'NEW_ORDER_CREATED'}, status=200)
             return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
+
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
 
     @login_check
-    def delete(self,request):
+    def delete(self, request):
         data = json.loads(request.body)
         cart = Cart.objects.filter(user_id=request.user, product_id=data['id'])
 
@@ -101,9 +103,9 @@ class CartView(View):
 
 class OrderView(View):
     @login_check
-    def get(self,request):
+    def get(self, request):
         saved_order = Order.objects.get(user_id=request.user, is_closed=False)
-        cart        = saved_order.cart_set.all()
+        cart = saved_order.cart_set.all()
 
         saved_cart = [
             {
@@ -113,8 +115,9 @@ class OrderView(View):
                 'quantity': prop.quantity
             } for prop in cart
         ]
-        total_q    = sum(item['quantity'] for item in saved_cart)
-        total_p    = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
+        total_q = sum(item['quantity'] for item in saved_cart)
+        total_p = Cart.objects.annotate(
+            price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
         base = 0
         for each_p in total_p:
@@ -124,7 +127,6 @@ class OrderView(View):
 
         shipping_address = Order.objects.get(user_id=request.user).user.address.through.objects.get(user_id=request.user).address
         ship_to = f"{shipping_address.address1}, {shipping_address.city} {shipping_address.state}, {shipping_address.postcode.postcode} {shipping_address.country}"
-
         shipping_cost = shipping_address.postcode.shipping_cost
         method = f" International Shipping ${shipping_cost}"
 
@@ -169,3 +171,5 @@ class OrderView(View):
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
+
+
