@@ -1,7 +1,6 @@
 import json
-import jwt
 
-from .models           import Order, Cart, PackageType, WishList
+from .models           import Order, Cart, PaymentOption, Card, Coupon, PackageType, BillingAddress, WishList
 from products.models   import Product
 from account.models    import User
 from account.utils     import login_check
@@ -10,7 +9,7 @@ from django.views      import View
 from django.http       import HttpResponse,JsonResponse
 from django.db.models  import F, ExpressionWrapper, DecimalField
 
-class WishListCreateView(View):
+class WishListView(View):
     @login_check
     def post(self, request):
         try:
@@ -57,13 +56,12 @@ class WishListCreateView(View):
             return JsonResponse({'message': 'SUCCESS'}, status=200)
         return JsonResponse({'message': 'INVALID_INPUT'}, status=400)
 
-
 class CartView(View):
     @login_check
     def post(self, request):
         try:
             data    = json.loads(request.body)
-            user    = User.objects.get(email = request.user)
+            user    = User.objects.get(email=request.user)
             product = Product.objects.filter(id=data['id'], is_in_stock=True)
             cart    = Cart.objects.filter(user_id=user.id, product_id=data['id'])
             order   = Order.objects.filter(user=user, is_closed=False)
@@ -74,21 +72,22 @@ class CartView(View):
                         saved_cart = cart.get()
                         saved_cart.quantity = data['quantity']
                         saved_cart.save()
-                        return JsonResponse({'message' : 'QTY_CHANGED'}, status=200)
+                        order.update(package_type=data['package_type_id'])
+                        return JsonResponse({'message': 'UPDATED'}, status=200)
                     Cart.objects.create(
-                         user       = user,
-                         order      = order.get(),
-                         product_id = data['id'],
-                         quantity   = data['quantity']
+                        user=user,
+                        order=order.get(),
+                        product_id=data['id'],
+                        quantity=data['quantity']
                     )
-                    return JsonResponse({'message': 'CART_ADDED'}, status=200)
+                    return JsonResponse({'message': 'NEW_CART_ADDED'}, status=200)
                 Cart.objects.create(
-                    user       = user,
-                    order      = Order.objects.create(user = user),
-                    product_id = data['id'],
-                    quantity   = data['quantity']
+                    user=user,
+                    order=Order.objects.create(user=user),
+                    product_id=data['id'],
+                    quantity=data['quantity']
                 )
-                return JsonResponse({'message': 'ORDER_CREATED'}, status=200)
+                return JsonResponse({'message': 'NEW_ORDER_CREATED'}, status=200)
             return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
@@ -127,5 +126,11 @@ class OrderView(View):
         saved_order.total_price = base + saved_order.package_type.price
         saved_order.save()
 
-        res = [saved_cart, {"total_quantity" : total_q}, {"total_price" : saved_order.total_price}]
+        shipping_address = Order.objects.get(user_id=6).user.address.through.objects.get(user_id=6).address
+        ship_to = f"{shipping_address.address1}, {shipping_address.city} {shipping_address.state}, {shipping_address.postcode.postcode} {shipping_address.country}"
+
+        shipping_cost = shipping_address.postcode.shipping_cost
+        method = f" International Shipping ${shipping_cost}"
+
+        res = [saved_cart, {"total_quantity": total_q}, {"total_price": saved_order.total_price}, {"ship_to": ship_to},{"shipping_cost": method}]
         return JsonResponse({'cart': res}, status=200)
