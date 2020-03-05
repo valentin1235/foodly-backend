@@ -157,5 +157,6 @@ class SearchView(View):
         if len(query) > 2:
             recipe_data = list(Recipe.objects.values().filter(Q(title__icontains=query)))
             product_data = list(Product.objects.values().filter(Q(name__icontains=query)))
-            return JsonResponse({"message": f'recipe_data : {recipe_data} + product_data : {product_data}'},
+
+            return JsonResponse({"data": f'recipe_data : {recipe_data} + product_data : {product_data}'},
                                 status=200)
