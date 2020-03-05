@@ -1,8 +1,7 @@
-import json
+import json, requests
 import jwt
 import re
 import bcrypt
-
 from .models import User, Address
 
 from django.views import View
@@ -94,3 +93,4 @@ class SignInView(View):
 
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
+
