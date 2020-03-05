@@ -57,7 +57,7 @@ class ProductDetailView(View):
         return JsonResponse({'data' : product_info}, status = 200)
         
 class ProductCategoryView(View):
-    def get(self, request, category_name):
+    def get(self, request, category_name, *args, **kwargs):
         sort_by = request.GET.get('sort_by', None)
         category_filter = Product.objects.prefetch_related('harvest_year', 'measure').filter(category__name = category_name).order_by('id')        
         offset = int(request.GET.get('offset', 0))
@@ -136,7 +136,6 @@ class RecommendationView(View):
         }
         
         return JsonResponse({'data' : recommended_recipe}, status = 200)
-
 
 
 class SearchView(View):
