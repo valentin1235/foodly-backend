@@ -52,8 +52,8 @@ class SignUpView(View):
 
             User(
                 email=data['email'],
-                first_name=data['firstName'],
-                last_name=data['lastName'],
+                firstName=data['firstName'],
+                lastName=data['lastName'],
                 password=bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             ).save()
 
