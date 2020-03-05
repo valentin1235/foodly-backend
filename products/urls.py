@@ -19,3 +19,4 @@ urlpatterns = [
         path('/promotion', BundleView.as_view()),
         path('/lookbook',RecommendationView.as_view()),
         ]
+
