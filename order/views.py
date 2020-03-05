@@ -1,12 +1,12 @@
 import json
 
-from .models          import Order, Cart, PackageType, WishList
-from products.models  import Product
-from account.models   import User
-from account.utils    import login_check
+from .models           import Order, Cart, PaymentOption, Card, Coupon, PackageType, BillingAddress, WishList
+from products.models   import Product
+from account.models    import User
+from account.utils     import login_check
 
-from django.views     import View
-from django.http      import HttpResponse, JsonResponse
+from django.views import View
+from django.http import HttpResponse, JsonResponse
 from django.db.models import F, ExpressionWrapper, DecimalField
 
 class WishListView(View):
@@ -69,8 +69,10 @@ class CartView(View):
                         saved_cart = cart.get()
                         saved_cart.quantity = data['quantity']
                         saved_cart.save()
+
                         order.update(package_type=data['package_type_id'])
                         return JsonResponse({'message': 'UPDATED'}, status=200)
+
                     Cart.objects.create(
                         user=request.user,
                         order=order.get(),
@@ -131,6 +133,7 @@ class OrderView(View):
         method = f" International Shipping ${shipping_cost}"
 
         res = [saved_cart, {"total_quantity": total_q}, {"total_price": saved_order.total_price}, {"ship_to": ship_to},{"shipping_cost": method}]
+<<<<<<< HEAD
         return JsonResponse({'cart': res}, status=200)
 
     @login_check
@@ -171,5 +174,3 @@ class OrderView(View):
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
-
-
