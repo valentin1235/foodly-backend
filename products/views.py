@@ -153,10 +153,24 @@ class SearchView(View):
 
     def get(self, request):
         query = request.GET.get('search', None)
-
+        product_dict = {}
+        recipe_dict = {}
         if len(query) > 2:
-            recipe_data = list(Recipe.objects.values().filter(Q(title__icontains=query)))
-            product_data = list(Product.objects.values().filter(Q(name__icontains=query)))
+            recipe_data = Recipe.objects.values().filter(Q(title__icontains=query))
+            product_data = Product.objects.values().filter(Q(name__icontains=query))
+            data = {}
+            product_dict = [{
+                'name':p['name'],
+                'price':p['price'],
+            }for p in product_data.values()]
 
-            return JsonResponse({"data": f'recipe_data : {recipe_data} + product_data : {product_data}'},
-                                status=200)
+            recipe_dict = [{
+                'id':r['id'],
+                '':r['title'],
+            }for r in recipe_data.values()]
+
+            data = {"product":product_dict,
+                    "recipe":recipe_dict}
+
+            return JsonResponse({"data":data},status=200)
+
