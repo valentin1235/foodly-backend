@@ -11,8 +11,8 @@ from .models                    import Product, Category, ProductCategory, Recip
 class ProductView(View):
     def get(self, request, *args, **kwargs):
         sort_by = request.GET.get('sort_by', None)
-        start   = request.GET.get('start', None)
-        end     = request.GET.get('end', None)
+        start   = int(request.GET.get('start', 0))
+        end     = int(request.GET.get('end', Product.objects.all().count()))
         product_info = Product.objects.select_related('harvest_year', 'measure').order_by('id').values(
                 'name',
                 'id',
@@ -22,13 +22,8 @@ class ProductView(View):
                 'measure_id__measure', 
                 'is_on_sale',
                 'is_in_stock',
-        )
+        )[start:end]
         
-        if start and end:
-            paged_product = product_info[int(start):int(end)]
-
-            return JsonResponse({'data' : list(paged_product)}, status = 200)            
-
         if sort_by:
             sorted_product = product_info.order_by(sort_by)
 
@@ -62,12 +57,13 @@ class ProductDetailView(View):
         return JsonResponse({'data' : product_info}, status = 200)
         
 class ProductCategoryView(View):
-    def get(self, request, category_name):
+    def get(self, request, category_name, *args, **kwargs):
         sort_by = request.GET.get('sort_by', None)
-        start   = request.GET.get('start', None)
-        end     = request.GET.get('end', None)        
-        category_filter = Product.objects.filter(category__name = category_name).prefetch_related('harvest_year', 'measure')
+        category_filter = Product.objects.prefetch_related('harvest_year', 'measure').filter(category__name = category_name).order_by('id')        
+        start   = int(request.GET.get('start', 0))
+        end     = int(request.GET.get('end', category_filter.count()))        
         categorized_page = category_filter.values(
+                'id',
                 'name',
                 'price',
                 'small_image',
@@ -75,12 +71,7 @@ class ProductCategoryView(View):
                 'measure_id__measure',
                 'is_on_sale',
                 'is_in_stock',
-        )
-
-        if start and end:
-            paged_product = categorized_page[int(start):int(end)]
-
-            return JsonResponse({'data' : list(paged_product)}, status = 200)
+        )[start:end]
 
         if sort_by:
             sort = categorized_page.order_by(sort_by)
@@ -90,14 +81,16 @@ class ProductCategoryView(View):
         return JsonResponse({'data' : list(categorized_page)}, status = 200)
 
 class RecipeView(View):
-    def get(self, request):
-        recipe_info = Recipe.objects.values(
+    def get(self, request, *args, **kwargs):
+        start = int(request.GET.get('start', 0))
+        end   = int(request.GET.get('end', Recipe.objects.all().count()))
+        recipe_info = Recipe.objects.order_by('title').values(
                 'title', 
                 'description', 
                 'company', 
                 'thumbnail_url',
                 'posting_date'
-        )
+        )[start:end]
         
         return JsonResponse({'data' : list(recipe_info)}, status = 200)
 
