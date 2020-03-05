@@ -11,6 +11,7 @@ class User(models.Model):
     update_at = models.DateTimeField(auto_now=True, null=True)
     is_delete = models.BooleanField(default=False)
     address = models.ManyToManyField('Address', through='User_address')
+    kakao_id = models.CharField(max_length=250, null=True)
 
     def __str__(self):
         return self.email

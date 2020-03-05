@@ -2,7 +2,7 @@ import json
 import jwt
 import re
 import bcrypt
-
+import requests
 from .models import User, Address
 
 from django.views import View
@@ -74,7 +74,6 @@ class SignUpView(View):
 
 
 class SignInView(View):
-    @login_check
     def post(self, request):
         data = json.loads(request.body)
         try:
@@ -94,3 +93,39 @@ class SignInView(View):
 
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=401)
+
+
+class KakaoSignInView(View):
+    def get(self, request):
+        token = request.headers.get('Authorization', None)
+
+        try:
+            if token:
+                url = 'https://kapi.kakao.com/v2/user/me'
+                header = {"Authorization": f"Bearer {token}"}
+                req = requests.get(url, headers=header)
+                req_json = req.json()
+
+                kakao_id = req_json.get('id', None)
+                kakao_account = req_json.get('kakao_account')
+                print('kakao_account', kakao_account)
+                kakao_email = kakao_account.get('email', None)
+                if User.objects.filter(email=kakao_email).exists():
+                    token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode(
+                        "utf-8")
+
+                    return JsonResponse({"token": token}, status=200)
+
+                else:
+                    User(
+                        email=kakao_email,
+                        kakao_id=kakao_id,
+                    ).save()
+
+                    token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode(
+                        "utf-8")
+
+                    return JsonResponse({"token": token}, status=200)
+
+        except KeyError:
+            return HttpResponse({'message': 'INVALID_TOKEN'}, status=400)
