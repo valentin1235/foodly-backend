@@ -11,18 +11,20 @@ class HomeView(View):
     def get(self, request):
         product_data_caching = Product.objects.prefetch_related('category').select_related('season', 'harvest_year', 'measure')
         bundle_data_caching  = Bundle.objects.prefetch_related('product_set')
-        bundle_info          = bundle_data_caching.values('title', 'price', 'is_in_promotion')
+        bundle_info          = bundle_data_caching.values('title', 'price')
         content_info         = [
                 list(data.product_set.values('measure_id__measure', 'name')
                     .annotate(Count('name'))) for data in bundle_data_caching
                 ]
         bundle_deal          = [data for data in zip(bundle_info, content_info)]        
         category_deal        = product_data_caching.filter(is_main=True, discount_rate='', category__name='fresh').values(
+                'id',
                 'name', 
                 'category__name', 
                 'big_image2'
         )
         seasonal_deal        = product_data_caching.filter(is_main=True, season_id__name='september').values(
+                'id',
                 'discount_rate', 
                 'name', 
                 'season_id__name', 

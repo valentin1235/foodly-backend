@@ -120,7 +120,20 @@ class BundleView(View):
 
         return JsonResponse({'data' :  bundle}, status = 200)
 
-
-
+class RecommendationView(View):
+    def get(self, request):
+        data_caching = Recipe.objects.prefetch_related('product_set').get(is_main = True)
+        recommended_recipe = {
+                'title'         : data_caching.title,
+                'thumbnail_url' : data_caching.thumbnail_url,
+                'product_info'  : list(data_caching.product_set.values(
+                    'name',
+                    'price',
+                    'measure_id__measure', 
+                    'harvest_year_id__year'
+                ))
+        }
+        
+        return JsonResponse({'data' : recommended_recipe}, status = 200)
 
 
