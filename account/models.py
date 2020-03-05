@@ -13,9 +13,6 @@ class User(models.Model):
     address = models.ManyToManyField('Address', through='User_address')
     kakao_id = models.CharField(max_length=250, null=True)
 
-    def __str__(self):
-        return self.email
-
     class Meta:
         db_table = 'users'
 
