@@ -52,13 +52,13 @@ class PackageType(models.Model):
     class Meta:
         db_table = 'package_types'
 
-def get_payment_option():
+def get_package_type():
     return PackageType.objects.get(id=1).id
 
 class Order(models.Model):
     id               = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, unique = True)
     user             = models.ForeignKey(User, on_delete = models.SET_NULL, null = True)
-    package_type     = models.ForeignKey(PackageType,default=get_payment_option, on_delete = models.CASCADE)
+    package_type     = models.ForeignKey(PackageType,default=get_package_type, on_delete = models.CASCADE)
     payment_option   = models.ForeignKey(PaymentOption,on_delete = models.CASCADE, null = True)
     coupon           = models.ForeignKey(Coupon, on_delete = models.SET_NULL, null = True)
     billing_address  = models.ForeignKey(BillingAddress, on_delete = models.SET_NULL, null = True)
