@@ -30,7 +30,7 @@ class HomeView(View):
                 'season_id__name', 
                 'big_image1'
         )
-        recommand_product    = product_data_caching.all().order_by('id').exclude(is_in_stock=0, big_image1='')[:24].values(
+        recommand_product    = product_data_caching.all().order_by('id').filter(is_main = True).exclude(is_in_stock=0, big_image1='').values(
                 'id',
                 'price',
                 'name',
