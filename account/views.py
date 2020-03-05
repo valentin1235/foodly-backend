@@ -29,11 +29,6 @@ class SignUpView(View):
         try:
             data = json.loads(request.body)
             validate_email(data['email'])
-            print('data : ', data)
-
-            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
-                'password'] is None:
-                return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
             if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
                 'password'] is None:
@@ -92,7 +87,7 @@ class SignInView(View):
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
 
         except User.DoesNotExist:
-            return JsonResponse({"message": "INVALID_USER"}, status=401)
+            return JsonResponse({"message": "INVALID_USER"}, status=400)
 
 
 class KakaoSignInView(View):
