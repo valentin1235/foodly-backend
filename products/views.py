@@ -11,8 +11,8 @@ from .models                    import Product, Category, ProductCategory, Recip
 class ProductView(View):
     def get(self, request, *args, **kwargs):
         sort_by = request.GET.get('sort_by', None)
-        start   = int(request.GET.get('start', 0))
-        end     = int(request.GET.get('end', Product.objects.all().count()))
+        offset   = int(request.GET.get('offset', 0))
+        limit    = offset + 12
         product_info = Product.objects.select_related('harvest_year', 'measure').order_by('id').values(
                 'name',
                 'id',
@@ -22,7 +22,7 @@ class ProductView(View):
                 'measure_id__measure', 
                 'is_on_sale',
                 'is_in_stock',
-        )[start:end]
+        )[offset:limit]
         
         if sort_by:
             sorted_product = product_info.order_by(sort_by)
