@@ -7,11 +7,11 @@ import requests
 from .models import User, Address
 
 from django.views import View
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse , JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-from foodly_project.my_settings import SECRET_KEY, ALGORITHM
+from foodly_project.my_settings import SECRET_KEY , ALGORITHM
 from .utils import login_check
 
 
@@ -108,8 +108,7 @@ class KakaoSignInView(View):
             kakao_email = kakao_account.get('email', None)
 
             if User.objects.filter(email=kakao_email).exists():
-                token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode(
-                    "utf-8")
+                token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode("utf-8")
                 return JsonResponse({"token": token}, status=200)
 
             User(
@@ -117,8 +116,7 @@ class KakaoSignInView(View):
                 kakao_id=kakao_id,
             ).save()
 
-            token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode(
-                "utf-8")
+            token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode("utf-8")
             return JsonResponse({"token": token}, status=200)
 
         except TypeError:
