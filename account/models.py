@@ -5,8 +5,8 @@ from django.db import models
 class User(models.Model):
     email = models.EmailField(max_length=200, unique=True, verbose_name='email', null=True)
     password = models.CharField(max_length=200, null=True)
-    firstName = models.CharField(max_length=45, null=True)
-    lastName = models.CharField(max_length=45, null=True)
+    first_name = models.CharField(max_length=45, null=True)
+    last_name = models.CharField(max_length=45, null=True)
     create_at = models.DateTimeField(auto_now_add=True, null=True)
     update_at = models.DateTimeField(auto_now=True, null=True)
     is_delete = models.BooleanField(default=False)

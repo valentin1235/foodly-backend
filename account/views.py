@@ -31,17 +31,17 @@ class SignUpView(View):
             print('data',data)
             validate_email(data['email'])
 
-            if data['email'] is None or data['firstName'] is None or data['lastName'] is None or data[
+            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
                 'password'] is None:
                 return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
             if User.objects.filter(email=data['email']).exists():
                 return HttpResponse(status=400)
 
-            if find_special(data['firstName']):
+            if find_special(data['first_name']):
                 return HttpResponse(status=400)
 
-            if find_special(data['lastName']):
+            if find_special(data['last_name']):
                 return HttpResponse(status=400)
 
             if find_space(data['password']):
@@ -52,8 +52,8 @@ class SignUpView(View):
 
             User(
                 email=data['email'],
-                firstName=data['firstName'],
-                lastName=data['lastName'],
+                first_name =data['first_name'],
+                last_name=data['last_name'],
                 password=bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             ).save()
 
