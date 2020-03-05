@@ -5,17 +5,17 @@ from products.models   import Product
 from account.models    import User
 from account.utils     import login_check
 
-from django.views      import View
-from django.http       import HttpResponse,JsonResponse
-from django.db.models  import F, ExpressionWrapper, DecimalField
+from django.views import View
+from django.http import HttpResponse, JsonResponse
+from django.db.models import F, ExpressionWrapper, DecimalField
 
 class WishListView(View):
     @login_check
     def post(self, request):
         try:
-            data     = json.loads(request.body)
-            user     = User.objects.get(email=request.user)
-            product  = Product.objects.filter(id=data['id'], is_in_stock = True)
+            data = json.loads(request.body)
+            user = User.objects.get(email=request.user)
+            product = Product.objects.filter(id=data['id'], is_in_stock=True)
             wishlist = WishList.objects.filter(user_id=user, product_id=data['id'])
 
             if product.exists():
@@ -24,7 +24,8 @@ class WishListView(View):
                     saved.quantity = data['quantity']
                     saved.save()
                     return JsonResponse({'message': 'SUCCESS'}, status=200)
-                WishList.objects.create(product = Product.objects.get(id=data['id']), user=user, quantity=data['quantity'])
+                WishList.objects.create(product=Product.objects.get(id=data['id']), user=user,
+                                        quantity=data['quantity'])
                 return JsonResponse({'message': 'SUCCESS'}, status=200)
             return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
@@ -46,7 +47,7 @@ class WishListView(View):
         return JsonResponse({'wishlist': saved_list}, status=200)
 
     @login_check
-    def delete(self,request):
+    def delete(self, request):
         data = json.loads(request.body)
         user = User.objects.get(email=request.user)
         wishlist = WishList.objects.filter(user_id=user, product_id=data['id'])
@@ -60,11 +61,12 @@ class CartView(View):
     @login_check
     def post(self, request):
         try:
-            data    = json.loads(request.body)
-            user    = User.objects.get(email=request.user)
+
+            data = json.loads(request.body)
+            user = User.objects.get(email=request.user)
             product = Product.objects.filter(id=data['id'], is_in_stock=True)
-            cart    = Cart.objects.filter(user_id=user.id, product_id=data['id'])
-            order   = Order.objects.filter(user=user, is_closed=False)
+            cart = Cart.objects.filter(user_id=user.id, product_id=data['id'])
+            order = Order.objects.filter(user=user, is_closed=False)
 
             if product.exists():
                 if order.exists():
@@ -72,8 +74,10 @@ class CartView(View):
                         saved_cart = cart.get()
                         saved_cart.quantity = data['quantity']
                         saved_cart.save()
+
                         order.update(package_type=data['package_type_id'])
                         return JsonResponse({'message': 'UPDATED'}, status=200)
+
                     Cart.objects.create(
                         user=user,
                         order=order.get(),
@@ -93,7 +97,7 @@ class CartView(View):
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
 
     @login_check
-    def delete(self,request):
+    def delete(self, request):
         data = json.loads(request.body)
         user = User.objects.get(email=request.user)
         cart = Cart.objects.filter(user_id=user, product_id=data['id'])
@@ -103,11 +107,12 @@ class CartView(View):
             return JsonResponse({'message': 'SUCCESS'}, status=200)
         return JsonResponse({'message': 'INVALID_INPUT'}, status=400)
 
+
 class OrderView(View):
     @login_check
-    def get(self,request):
+    def get(self, request):
         saved_order = Order.objects.get(user_id=request.user, is_closed=False)
-        cart        = saved_order.cart_set.all()
+        cart = saved_order.cart_set.all()
 
         saved_cart = [
             {
@@ -117,8 +122,9 @@ class OrderView(View):
                 'quantity': prop.quantity
             } for prop in cart
         ]
-        total_q    = sum(item['quantity'] for item in saved_cart)
-        total_p    = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
+        total_q = sum(item['quantity'] for item in saved_cart)
+        total_p = Cart.objects.annotate(
+            price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
         base = 0
         for each_p in total_p:

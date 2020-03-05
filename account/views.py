@@ -3,7 +3,7 @@ import jwt
 import re
 import bcrypt
 
-from .models import User
+from .models import User, Address
 
 from django.views import View
 from django.http import HttpResponse, JsonResponse
@@ -11,6 +11,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
 from foodly_project.my_settings import SECRET_KEY, ALGORITHM
+from .utils import login_check
 
 
 # Create your views here.
@@ -23,10 +24,16 @@ def find_space(string):
 
 
 class SignUpView(View):
+
     def post(self, request):
         try:
             data = json.loads(request.body)
             validate_email(data['email'])
+            print('data : ', data)
+
+            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
+                'password'] is None:
+                return JsonResponse({'message': 'NOT_VALID'}, status=400)
 
             if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
                 'password'] is None:
@@ -54,20 +61,25 @@ class SignUpView(View):
                 password=bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             ).save()
 
+            return JsonResponse({"message": "success"}, status=200)
+
         except ValidationError:
             return HttpResponse(status=400)
 
         except KeyError:
             return HttpResponse(status=400)
 
+    def get(self, request):
+        return JsonResponse({"message": "회원가입페이지"}, status=200)
+
 
 class SignInView(View):
+    @login_check
     def post(self, request):
         data = json.loads(request.body)
         try:
             if User.objects.filter(email=data['email']).exists():
                 user = User.objects.get(email=data['email'])
-
                 if bcrypt.checkpw(data['password'].encode(), user.password.encode('utf-8')):
                     token = jwt.encode({'email': data['email']}, SECRET_KEY['secret'],
                                        algorithm=ALGORITHM).decode()
