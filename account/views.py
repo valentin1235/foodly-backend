@@ -28,6 +28,7 @@ class SignUpView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
+            print('data',data)
             validate_email(data['email'])
 
             if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
