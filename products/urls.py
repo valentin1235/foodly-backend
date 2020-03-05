@@ -10,3 +10,4 @@ urlpatterns = [
         path('/recipes/<int:recipe_id>', RecipeDetailView.as_view()),
         path('/promotion', BundleView.as_view())
         ]
+

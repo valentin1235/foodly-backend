@@ -5,4 +5,4 @@ urlpatterns = [
     path('/wishlist', WishListCreateView.as_view()),
     path('/cart', CartView.as_view()),
     path('/checkout', OrderView.as_view()),
-    ]
+]
