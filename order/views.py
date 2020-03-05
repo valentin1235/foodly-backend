@@ -151,8 +151,8 @@ class OrderView(View):
                 state               = data['state'],
                 postcode            = data['postcode']
             ).save()
-
             billing = BillingAddress.objects.filter(user=request.user).order_by('-id')[0]
+
             shipping_cost = open_order.get().user.address.through.objects.get(user_id=request.user).address.postcode.shipping_cost
 
             Order(
@@ -163,12 +163,9 @@ class OrderView(View):
             ).save()
 
             return JsonResponse({'message': 'SUCCESS'}, status=200)
-
         except Coupon.DoesNotExist:
             return JsonResponse({"message":"INVALID_COUPONS"}, status=400)
-
         except Order.DoesNotExist:
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
-
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
