@@ -25,7 +25,6 @@ def find_space(string):
 
 
 class SignUpView(View):
-
     def post(self, request):
         data = json.loads(request.body)
 
@@ -68,7 +67,7 @@ class SignUpView(View):
 
 
 class SignInView(View):
-
+    @login_check()
     def post(self, request):
         data = json.loads(request.body)
 
@@ -93,7 +92,6 @@ class SignInView(View):
 
 
 class KakaoSignInView(View):
-
     def get(self, request):
         token = request.headers.get('Authorization', None)
 
