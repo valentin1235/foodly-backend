@@ -19,10 +19,8 @@ from .utils import login_check
 def find_special(name):
     return bool(re.search('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]', name))
 
-
 def find_space(string):
     return bool(re.search(' ', string))
-
 
 class SignUpView(View):
     def post(self, request):
