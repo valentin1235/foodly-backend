@@ -124,3 +124,5 @@ class KakaoSignInView(View):
 
         except TypeError:
            return HttpResponse(status=400)
+        except jwt.DecodeError:
+            return HttpResponse(status=401)
