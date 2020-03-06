@@ -1,6 +1,6 @@
 import json
 
-from .models           import Order, Cart, PaymentOption, Card, Coupon, PackageType, BillingAddress, WishList
+from .models           import Order, Cart, PaymentOption, Card, Coupon, BillingAddress, WishList
 from products.models   import Product
 from account.models    import User
 from account.utils     import login_check
@@ -133,7 +133,6 @@ class OrderView(View):
         method = f" International Shipping ${shipping_cost}"
 
         res = [saved_cart, {"total_quantity": total_q}, {"total_price": saved_order.total_price}, {"ship_to": ship_to},{"shipping_cost": method}]
-<<<<<<< HEAD
         return JsonResponse({'cart': res}, status=200)
 
     @login_check
@@ -157,15 +156,14 @@ class OrderView(View):
                 postcode            = data['postcode']
             ).save()
             billing = BillingAddress.objects.filter(user=request.user).order_by('-id')[0]
-
             shipping_cost = open_order.get().user.address.through.objects.get(user_id=request.user).address.postcode.shipping_cost
-
             Order(
                 billing_address_id = open_order.update(billing_address_id=billing),
                 coupon_id          = open_order.update(coupon_id=coupon),
                 payment_option_id  = open_order.update(payment_option_id=payment.id),
                 total_price        = open_order.get().total_price  * (1 - coupon.discount_rate if coupon.discount_rate is not None else 0) + shipping_cost
             ).save()
+            coupon.is_used= True
 
             return JsonResponse({'message': 'SUCCESS'}, status=200)
         except Coupon.DoesNotExist:
@@ -174,3 +172,24 @@ class OrderView(View):
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
+
+class ReceiptView(View):
+    @login_check
+    def get(self, request):
+        saved_order = Order.objects.get(user_id=request.user, is_closed=False)
+        cart = saved_order.cart_set.all()
+
+        saved_cart = [
+            {
+                'name': prop.product.name,
+                'price': f"${prop.product.price}",
+                'quantity': prop.quantity
+            } for prop in cart
+        ]
+        shipping_address = Order.objects.get(user_id=request.user).user.address.through.objects.get(user_id=request.user).address
+        ship_to = f"{shipping_address.address1}, {shipping_address.city} {shipping_address.state}, {shipping_address.postcode.postcode} {shipping_address.country}"
+        saved_order.is_closed = True
+        saved_order.save()
+
+        res = [saved_order.user.first_name, saved_order.user.last_name,saved_order.payment_option.payment, ship_to, saved_cart, f"${saved_order.total_price}", saved_order.package_type.package]
+        return JsonResponse({'receipt': res}, status=200)
