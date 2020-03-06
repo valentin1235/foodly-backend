@@ -131,5 +131,6 @@ class OrderView(View):
         saved_order.total_price = base + saved_order.package_type.price
         saved_order.save()
 
+
         res = [saved_cart, {"total_quantity": total_q}, {"total_price": saved_order.total_price}]
         return JsonResponse({'cart': res}, status=200)
