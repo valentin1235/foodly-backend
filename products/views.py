@@ -19,11 +19,11 @@ class ProductView(View):
                 'price',
                 'small_image',
                 'harvest_year__year',
-                'measure_id__measure', 
+                'measure_id__measure',
                 'is_on_sale',
                 'is_in_stock',
         )[offset:limit]
-        
+
         if sort_by:
             sorted_product = product_info.order_by(sort_by)
 
@@ -56,7 +56,7 @@ class ProductDetailView(View):
                 }
         
         return JsonResponse({'data' : product_info}, status = 200)
-        
+
 class ProductCategoryView(View):
     def get(self, request, category_name):
         sort_by = request.GET.get('sort_by', None)
@@ -131,12 +131,13 @@ class RecommendationView(View):
                 'product_info'  : list(data_caching.product_set.values(
                     'name',
                     'price',
+                    'measure_id__measure',
                     'small_image',
-                    'measure_id__measure', 
+                    'measure_id__measure',
                     'harvest_year_id__year'
                 ))
         }
-        
+
         return JsonResponse({'data' : recommended_recipe}, status = 200)
 
 
@@ -146,8 +147,24 @@ class SearchView(View):
         query = request.GET.get('search', None)
 
         if len(query) > 2:
-            recipe_data = list(Recipe.objects.values().filter(Q(title__icontains=query)))
-            product_data = list(Product.objects.values().filter(Q(name__icontains=query)))
+            recipe_data = Recipe.objects.filter(Q(title__icontains=query)).all()
+            product_data = Product.objects.filter(Q(name__icontains=query)).select_related('harvest_year').all()
 
-            return JsonResponse({"data": f'recipe_data : {recipe_data} + product_data : {product_data}'},
-                                status=200)
+
+            data={'product':[{
+                'id' : product.id,
+                'name':product.name,
+                'price':product.price,
+                'description':product.description,
+                'small_image':product.small_image,
+                'harvest_year' : product.harvest_year.year,
+                }for product in product_data],
+                'recipe':[{
+                'id':recipe.id,
+                'title':recipe.title,
+                'ingredient':recipe.ingredient,
+                'description':recipe.description,
+                'thumbnail_url':recipe.thumbnail_url,
+            }for recipe in recipe_data]}
+
+            return JsonResponse({'data':data},status=200)
