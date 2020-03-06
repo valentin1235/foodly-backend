@@ -162,6 +162,8 @@ class SearchView(View):
                 'price':p['price'],
                 'description':p['description'],
                 'small_image':p['small_image'],
+                'harvest_year':Product.objects.select_related('harvest_year').get(id=p['harvest_year_id']).harvest_year.year,
+                'is_in_stock':p['is_in_stock'],
                 }for p in product_data.values()],
                 'recipe':[{
                 'id':r['id'],
