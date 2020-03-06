@@ -1,6 +1,7 @@
 import jwt, bcrypt, json
 
 from django.db import IntegrityError
+from django.db.models import Q
 from django.views import View
 from django.http import HttpResponse, JsonResponse
 
@@ -146,3 +147,16 @@ class BundleView(View):
         bundle = [data for data in zip(bundle_info, content_info)]
 
         return JsonResponse({'data': bundle}, status=200)
+
+
+class SearchView(View):
+
+    def get(self, request):
+        query = request.GET.get('search', None)
+
+        if len(query) > 2:
+            recipe_data = list(Recipe.objects.values().filter(Q(title__icontains=query)))
+            product_data = list(Product.objects.values().filter(Q(name__icontains=query)))
+
+            return JsonResponse({"data": f'recipe_data : {recipe_data} + product_data : {product_data}'},
+                                status=200)
