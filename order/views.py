@@ -71,7 +71,7 @@ class CartView(View):
                 if order.exists():
                     if cart.exists():
                         cart.update(quantity=data['quantity'])
-                        order.update(package_type=data['package_type_id'])
+                        order.update(type=data['package_type_id'])
 
                         return HttpResponse(status=200)
 

@@ -35,6 +35,7 @@ class ProductDetailView(View):
     def get(self, request, product_id):
         data_caching = Product.objects.select_related('measure', 'harvest_year').prefetch_related('similar_product').get(id=product_id)
         product_info = {
+                'id'                    : data_caching.id,
                 'name'                  : data_caching.name,
                 'harvest_year_id__year' : data_caching.harvest_year.year,
                 'measure_id__measure'   : data_caching.measure.measure,
@@ -57,7 +58,7 @@ class ProductDetailView(View):
         return JsonResponse({'data' : product_info}, status = 200)
         
 class ProductCategoryView(View):
-    def get(self, request, category_name, *args, **kwargs):
+    def get(self, request, category_name):
         sort_by = request.GET.get('sort_by', None)
         category_filter = Product.objects.prefetch_related('harvest_year', 'measure').filter(category__name = category_name).order_by('id')        
         offset = int(request.GET.get('offset', 0))
@@ -130,6 +131,7 @@ class RecommendationView(View):
                 'product_info'  : list(data_caching.product_set.values(
                     'name',
                     'price',
+                    'small_image',
                     'measure_id__measure', 
                     'harvest_year_id__year'
                 ))

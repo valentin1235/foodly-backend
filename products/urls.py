@@ -12,7 +12,7 @@ from .views import (
         )
 
 urlpatterns = [
-        path('/collections', ProductView.as_view()),
+        path('/collections/product', ProductView.as_view()),
         path('/collections/<slug:category_name>', ProductCategoryView.as_view()),
         path('/<int:product_id>', ProductDetailView.as_view()),
         path('/recipes', RecipeView.as_view()),
