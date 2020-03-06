@@ -153,25 +153,36 @@ class SearchView(View):
 
     def get(self, request):
         query = request.GET.get('search', None)
+
         if len(query) > 2:
-            recipe_data = Recipe.objects.values().filter(Q(title__icontains=query))
-            product_data = Product.objects.values().filter(Q(name__icontains=query))
+            # 검색을 한다 . query 를 받는다 left 니깐. 
+            # query 가 포함되어있는 product 를 받고 , 참조하고 있는 harvest_year에 대한 내용도 가져와야한다.
+            recipe_data = Recipe.objects.filter(Q(title__icontains=query))
+            print('qweqwe' , recipe_data)
+#            product_data = Product.objects.filter(Q(name__icontains=query)).select_related('harvest_year').get(id=3).harvest_year.year
+            product_data = Product.objects.filter(Q(name__icontains=query)).select_related('harvest_year')
+            print('asdfasdf' ,product_data)
+            harvet = product_data.get(id=3).harvest_year.year
+            print('asdfasdfasdfasdf',harvet)
 
-            data={'product':[{
-                'name':pro_loop['name'],
-                'price':pro_loop['price'],
-                'description':pro_loop['description'],
-                'small_image':pro_loop['small_image'],
-                'harvest_year':Product.objects.select_related('harvest_year').get(id=pro_loop['harvest_year_id']).harvest_year.year,
-                'is_in_stock':pro_loop['is_in_stock'],
-                }for pro_loop in product_data.values()],
-                'recipe':[{
-                'id':reci_loop['id'],
-                'title':reci_loop['title'],
-                'ingredient':reci_loop['ingredient'],
-                'description':reci_loop['description'],
-                'thumbnail_url':reci_loop['thumbnail_url'],
-            }for reci_loop in recipe_data.values()]}
 
-            return JsonResponse({"data":data},status=200)
+#            data={'product':[{
+#                'id' : product['id'],
+#                'name':product['name'],
+#                'price':product['price'],
+#                'description':product['description'],
+#                'small_image':product['small_image'],
+#                'harvest_year':product[''],
+##                'harvest_year':Product.objects.select_related('harvest_year').get(id=product['harvest_year_id']).harvest_year.year,
+#                'is_in_stock':product['is_in_stock'],
+#                }for product in product_data.values()],
+#                'recipe':[{
+#                'id':recipe['id'],
+#                'title':recipe['title'],
+#                'ingredient':recipe['ingredient'],
+#                'description':recipe['description'],
+#                'thumbnail_url':recipe['thumbnail_url'],
+#            }for recipe in recipe_data.values()]}
+
+            return HttpResponse(status=200)
 
