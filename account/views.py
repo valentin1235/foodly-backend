@@ -97,6 +97,9 @@ class KakaoSignInView(View):
     def get(self, request):
         token = request.headers.get('Authorization', None)
 
+        if token is None:
+            return HttpResponse(status=400)
+
         try:
             url = 'https://kapi.kakao.com/v2/user/me'
             header = {"Authorization": f"Bearer {token}"}
@@ -120,8 +123,4 @@ class KakaoSignInView(View):
             return JsonResponse({"token": token}, status=200)
 
         except TypeError:
-            return HttpResponse(status=400)
-
-        except jwt.DecodeError:
-            return HttpResponse(status=400)
-
+           return HttpResponse(status=400)
