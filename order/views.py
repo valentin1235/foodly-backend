@@ -13,25 +13,20 @@ class WishListView(View):
     @login_check
     def post(self, request):
         try:
-            data     = json.loads(request.body)
-            product  = Product.objects.filter(id=data['id'], is_in_stock = True)
+            data = json.loads(request.body)
+            product = Product.objects.get(id=data['id'])
             wishlist = WishList.objects.filter(user_id=request.user, product_id=data['id'])
 
-            if product.exists():
-                if wishlist.exists():
-                    saved = wishlist.get()
-                    saved.quantity = data['quantity']
-                    saved.save()
+            if wishlist.exists():
+                wishlist.update(quantity=data['quantity'])
 
-                    return JsonResponse({'message': 'SUCCESS'}, status=200)
+                return HttpResponse(status=200)
 
-                WishList.objects.create(product = Product.objects.get(id=data['id']),
-                                        user=request.user,
-                                        quantity=data['quantity'])
+            WishList.objects.create(product=product,
+                                    user=request.user,
+                                    quantity=data['quantity'])
 
-                return JsonResponse({'message': 'SUCCESS'}, status=200)
-
-            return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
+            return HttpResponse(status=200)
 
         except WishList.DoesNotExist:
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
@@ -59,7 +54,7 @@ class WishListView(View):
         if wishlist.exists():
             wishlist.get().delete()
 
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return HttpResponse(status=200)
 
         return JsonResponse({'message': 'INVALID_INPUT'}, status=400)
 
@@ -75,13 +70,10 @@ class CartView(View):
             if product.exists():
                 if order.exists():
                     if cart.exists():
-                        saved_cart = cart.get()
-                        saved_cart.quantity = data['quantity']
-                        saved_cart.save()
-
+                        cart.update(quantity=data['quantity'])
                         order.update(package_type=data['package_type_id'])
 
-                        return JsonResponse({'message': 'UPDATED'}, status=200)
+                        return HttpResponse(status=200)
 
                     Cart.objects.create(
                         user=request.user,
@@ -89,7 +81,7 @@ class CartView(View):
                         product_id=data['id'],
                         quantity=data['quantity']
                     )
-                    return JsonResponse({'message': 'NEW_CART_ADDED'}, status=200)
+                    return HttpResponse(status=200)
 
                 Cart.objects.create(
                     user=request.user,
@@ -97,7 +89,7 @@ class CartView(View):
                     product_id=data['id'],
                     quantity=data['quantity']
                 )
-                return JsonResponse({'message': 'NEW_ORDER_CREATED'}, status=200)
+                return HttpResponse(status=200)
 
             return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
@@ -112,7 +104,7 @@ class CartView(View):
         if cart.exists():
             cart.get().delete()
 
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return HttpResponse(status=200)
 
         return JsonResponse({'message': 'INVALID_INPUT'}, status=400)
 
@@ -187,7 +179,7 @@ class OrderView(View):
 
             coupon.is_used= True
 
-            return JsonResponse({'message': 'SUCCESS'}, status=200)
+            return HttpResponse(status=200)
 
         except Coupon.DoesNotExist:
             return JsonResponse({"message":"INVALID_COUPONS"}, status=400)
