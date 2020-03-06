@@ -55,7 +55,7 @@ class ProductDetailView(View):
                 }
         
         return JsonResponse({'data' : product_info}, status = 200)
-        
+
 class ProductCategoryView(View):
     def get(self, request, category_name, *args, **kwargs):
         sort_by = request.GET.get('sort_by', None)
