@@ -22,13 +22,20 @@ class WishListView(View):
                     saved = wishlist.get()
                     saved.quantity = data['quantity']
                     saved.save()
+
                     return JsonResponse({'message': 'SUCCESS'}, status=200)
-                WishList.objects.create(product = Product.objects.get(id=data['id']), user=request.user, quantity=data['quantity'])
+
+                WishList.objects.create(product = Product.objects.get(id=data['id']),
+                                        user=request.user,
+                                        quantity=data['quantity'])
+
                 return JsonResponse({'message': 'SUCCESS'}, status=200)
+
             return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
         except WishList.DoesNotExist:
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
+
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEY'}, status=400)
 
@@ -51,7 +58,9 @@ class WishListView(View):
 
         if wishlist.exists():
             wishlist.get().delete()
+
             return JsonResponse({'message': 'SUCCESS'}, status=200)
+
         return JsonResponse({'message': 'INVALID_INPUT'}, status=400)
 
 class CartView(View):
@@ -71,6 +80,7 @@ class CartView(View):
                         saved_cart.save()
 
                         order.update(package_type=data['package_type_id'])
+
                         return JsonResponse({'message': 'UPDATED'}, status=200)
 
                     Cart.objects.create(
@@ -80,14 +90,15 @@ class CartView(View):
                         quantity=data['quantity']
                     )
                     return JsonResponse({'message': 'NEW_CART_ADDED'}, status=200)
+
                 Cart.objects.create(
                     user=request.user,
                     order=Order.objects.create(user=request.user),
-
                     product_id=data['id'],
                     quantity=data['quantity']
                 )
                 return JsonResponse({'message': 'NEW_ORDER_CREATED'}, status=200)
+
             return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
         except KeyError:
@@ -100,7 +111,9 @@ class CartView(View):
 
         if cart.exists():
             cart.get().delete()
+
             return JsonResponse({'message': 'SUCCESS'}, status=200)
+
         return JsonResponse({'message': 'INVALID_INPUT'}, status=400)
 
 class OrderView(View):
@@ -128,11 +141,17 @@ class OrderView(View):
         saved_order.save()
 
         shipping_address = Order.objects.get(user_id=request.user).user.address.through.objects.get(user_id=request.user).address
-        ship_to = f"{shipping_address.address1}, {shipping_address.city} {shipping_address.state}, {shipping_address.postcode.postcode} {shipping_address.country}"
-        shipping_cost = shipping_address.postcode.shipping_cost
-        method = f" International Shipping ${shipping_cost}"
 
-        res = [saved_cart, {"total_quantity": total_q}, {"total_price": saved_order.total_price}, {"ship_to": ship_to},{"shipping_cost": method}]
+        res = [saved_cart,
+               {"total_quantity" : total_q},
+               {"total_price" : saved_order.total_price},
+               {"address1" : shipping_address.address1},
+               {"city" : shipping_address.city},
+               {"state" : shipping_address.state},
+               {"postcode" : shipping_address.postcode.postcode},
+               {"country" : shipping_address.country},
+               {"shipping_cost" : shipping_address.postcode.shipping_cost}
+        ]
         return JsonResponse({'cart': res}, status=200)
 
     @login_check
@@ -156,20 +175,26 @@ class OrderView(View):
                 postcode            = data['postcode']
             ).save()
             billing = BillingAddress.objects.filter(user=request.user).order_by('-id')[0]
+
             shipping_cost = open_order.get().user.address.through.objects.get(user_id=request.user).address.postcode.shipping_cost
+
             Order(
                 billing_address_id = open_order.update(billing_address_id=billing),
                 coupon_id          = open_order.update(coupon_id=coupon),
                 payment_option_id  = open_order.update(payment_option_id=payment.id),
                 total_price        = open_order.get().total_price  * (1 - coupon.discount_rate if coupon.discount_rate is not None else 0) + shipping_cost
             ).save()
+
             coupon.is_used= True
 
             return JsonResponse({'message': 'SUCCESS'}, status=200)
+
         except Coupon.DoesNotExist:
             return JsonResponse({"message":"INVALID_COUPONS"}, status=400)
+
         except Order.DoesNotExist:
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
+
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
 
@@ -182,14 +207,26 @@ class ReceiptView(View):
         saved_cart = [
             {
                 'name': prop.product.name,
-                'price': f"${prop.product.price}",
+                'price': prop.product.price,
                 'quantity': prop.quantity
             } for prop in cart
         ]
+
         shipping_address = Order.objects.get(user_id=request.user).user.address.through.objects.get(user_id=request.user).address
-        ship_to = f"{shipping_address.address1}, {shipping_address.city} {shipping_address.state}, {shipping_address.postcode.postcode} {shipping_address.country}"
+
         saved_order.is_closed = True
         saved_order.save()
 
-        res = [saved_order.user.first_name, saved_order.user.last_name,saved_order.payment_option.payment, ship_to, saved_cart, f"${saved_order.total_price}", saved_order.package_type.package]
+        res = [saved_order.user.first_name,
+               saved_order.user.last_name,saved_order.payment_option.payment,
+               shipping_address.address1,
+               shipping_address.city,
+               shipping_address.state,
+               shipping_address.postcode.postcode,
+               shipping_address.country,
+               saved_cart,
+               saved_order.total_price,
+               saved_order.package_type.package
+        ]
+
         return JsonResponse({'receipt': res}, status=200)
