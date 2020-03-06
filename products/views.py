@@ -158,20 +158,20 @@ class SearchView(View):
             product_data = Product.objects.values().filter(Q(name__icontains=query))
 
             data={'product':[{
-                'name':p['name'],
-                'price':p['price'],
-                'description':p['description'],
-                'small_image':p['small_image'],
-                'harvest_year':Product.objects.select_related('harvest_year').get(id=p['harvest_year_id']).harvest_year.year,
-                'is_in_stock':p['is_in_stock'],
-                }for p in product_data.values()],
+                'name':pro_loop['name'],
+                'price':pro_loop['price'],
+                'description':pro_loop['description'],
+                'small_image':pro_loop['small_image'],
+                'harvest_year':Product.objects.select_related('harvest_year').get(id=pro_loop['harvest_year_id']).harvest_year.year,
+                'is_in_stock':pro_loop['is_in_stock'],
+                }for pro_loop in product_data.values()],
                 'recipe':[{
-                'id':r['id'],
-                'title':r['title'],
-                'ingredient':r['ingredient'],
-                'description':r['description'],
-                'thumbnail_url':r['thumbnail_url'],
-            }for r in recipe_data.values()]}
+                'id':reci_loop['id'],
+                'title':reci_loop['title'],
+                'ingredient':reci_loop['ingredient'],
+                'description':reci_loop['description'],
+                'thumbnail_url':reci_loop['thumbnail_url'],
+            }for reci_loop in recipe_data.values()]}
 
             return JsonResponse({"data":data},status=200)
 
