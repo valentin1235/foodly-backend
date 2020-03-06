@@ -67,7 +67,7 @@ class SignUpView(View):
 
 
 class SignInView(View):
-    @login_check()
+    @login_check
     def post(self, request):
         data = json.loads(request.body)
 
