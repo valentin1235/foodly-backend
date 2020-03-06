@@ -5,8 +5,12 @@ cffi==1.13.2
 Django==3.0.1
 django-cors-headers==3.2.0
 mysql-connector-python==8.0.18
+<<<<<<< HEAD
+protobuf==3.11.2
+=======
 mysqlclient==1.4.6
 protobuf==3.11.1
+>>>>>>> 962c7a1da94a59fc09227f28ee7ab1ec977d496a
 pycparser==2.19
 PyJWT==1.7.1
 pytz==2019.3
