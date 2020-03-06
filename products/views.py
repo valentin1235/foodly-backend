@@ -159,7 +159,6 @@ class SearchView(View):
             # query 가 포함되어있는 product 를 받고 , 참조하고 있는 harvest_year에 대한 내용도 가져와야한다.
             recipe_data = Recipe.objects.filter(Q(title__icontains=query))
             print('qweqwe' , recipe_data)
-#            product_data = Product.objects.filter(Q(name__icontains=query)).select_related('harvest_year').get(id=3).harvest_year.year
             product_data = Product.objects.filter(Q(name__icontains=query)).select_related('harvest_year')
             print('asdfasdf' ,product_data)
             harvet = product_data.get(id=3).harvest_year.year
