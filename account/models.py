@@ -1,7 +1,6 @@
 from django.db import models
 
 
-# Create your models here.
 class User(models.Model):
     email = models.EmailField(max_length=200, unique=True, verbose_name='email', null=True)
     password = models.CharField(max_length=200, null=True)
@@ -11,9 +10,6 @@ class User(models.Model):
     update_at = models.DateTimeField(auto_now=True, null=True)
     is_delete = models.BooleanField(default=False)
     address = models.ManyToManyField('Address', through='User_address')
-
-    def __str__(self):
-        return self.email
 
     class Meta:
         db_table = 'users'
