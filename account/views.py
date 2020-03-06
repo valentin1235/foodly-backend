@@ -107,7 +107,7 @@ class KakaoSignInView(View):
             req_json = req.json()
 
             kakao_id = req_json.get('id', None)
-            kakao_account = req_json.get('kakao_account')
+            kakao_account = req_json.get('kakao_account', None)
             kakao_email = kakao_account.get('email', None)
 
             if User.objects.filter(email=kakao_email).exists():
@@ -122,7 +122,7 @@ class KakaoSignInView(View):
             token = jwt.encode({"email": kakao_email}, SECRET_KEY['secret'], algorithm=ALGORITHM).decode("utf-8")
             return JsonResponse({"token": token}, status=200)
 
-        except TypeError:
+        except KeyError:
            return HttpResponse(status=400)
         except jwt.DecodeError:
             return HttpResponse(status=401)
