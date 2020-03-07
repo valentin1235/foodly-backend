@@ -1,11 +1,11 @@
 from django.urls import path
 
 from .views import (
-        ProductView, 
-        ProductDetailView, 
-        ProductCategoryView, 
-        RecipeView, 
-        RecipeDetailView, 
+        ProductView,
+        ProductDetailView,
+        ProductCategoryView,
+        RecipeView,
+        RecipeDetailView,
         BundleView,
         RecommendationView,
         SearchView,
@@ -20,4 +20,4 @@ urlpatterns = [
         path('/promotion', BundleView.as_view()),
         path('/lookbook',RecommendationView.as_view()),
         path('/search', SearchView.as_view()),
-        ]
+ ]
