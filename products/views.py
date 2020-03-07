@@ -10,10 +10,10 @@ from .models                    import Product, Category, ProductCategory, Recip
 
 class ProductView(View):
     def get(self, request):
-        sort_by = request.GET.get('sort_by', None)
+        sort_by = request.GET.get('sort_by', 'id')
         offset   = int(request.GET.get('offset', 0))
         limit    = offset + 12
-        product_info = Product.objects.select_related('harvest_year', 'measure').order_by('id').values(
+        product_info = Product.objects.select_related('harvest_year', 'measure').order_by(sort_by).values(
                 'name',
                 'id',
                 'price',
@@ -23,11 +23,6 @@ class ProductView(View):
                 'is_on_sale',
                 'is_in_stock',
         )[offset:limit]
-
-        if sort_by:
-            sorted_product = product_info.order_by(sort_by)
-
-            return JsonResponse({'data' : list(sorted_product)}, status = 200)
 
         return JsonResponse({'data' : list(product_info)}, status = 200)
 
@@ -59,11 +54,11 @@ class ProductDetailView(View):
 
 class ProductCategoryView(View):
     def get(self, request, category_name):
-        sort_by = request.GET.get('sort_by', None)
-        category_filter = Product.objects.prefetch_related('harvest_year', 'measure').filter(category__name = category_name).order_by('id')        
+        sort_by = request.GET.get('sort_by', 'id')
+        category_filter = Product.objects.prefetch_related('harvest_year', 'measure').filter(category__name = category_name)        
         offset = int(request.GET.get('offset', 0))
         limit  = offset + 12        
-        categorized_page = category_filter.order_by('id').values(
+        categorized_page = category_filter.order_by(sort_by).values(
                 'id',
                 'name',
                 'price',
@@ -73,11 +68,6 @@ class ProductCategoryView(View):
                 'is_on_sale',
                 'is_in_stock',
         )[offset:limit]
-
-        if sort_by:
-            sort = categorized_page.order_by(sort_by)
-            
-            return JsonResponse({'data' : list(sort)}, status = 200)
         
         return JsonResponse({'data' : list(categorized_page)}, status = 200)
 
