@@ -10,7 +10,7 @@ from products.models import Product, Recipe, Bundle
 class HomeView(View):
     def get(self, request):
         product_data_caching = Product.objects.prefetch_related('category').select_related('season', 'harvest_year', 'measure') 
-        bundles = Bundle.objects.all()
+        bundles = Bundle.objects.prefetch_related('product_set').all()
         bundle_deal = [
                 {
                     'title'   : bundle.title,
