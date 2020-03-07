@@ -40,7 +40,7 @@ class WishListView(View):
             {
                 'name': item.product.name,
                 'price': item.product.price,
-                'thumbnail_url': item.product.thumbnail_url,
+                'small_image': item.product.small_image,
                 'quantity': item.quantity
             } for item in WishList.objects.filter(user_id=request.user)
         ]
@@ -62,16 +62,16 @@ class CartView(View):
     @login_check
     def post(self, request):
         try:
-            data    = json.loads(request.body)
+            data = json.loads(request.body)
             product = Product.objects.filter(id=data['id'], is_in_stock=True)
-            cart    = Cart.objects.filter(user_id=request.user, product_id=data['id'])
-            order   = Order.objects.filter(user=request.user, is_closed=False)
+            cart = Cart.objects.filter(user_id=request.user, product_id=data['id'])
+            order = Order.objects.filter(user=request.user, is_closed=False)
 
             if product.exists():
                 if order.exists():
                     if cart.exists():
                         cart.update(quantity=data['quantity'])
-                        order.update(type=data['package_type_id'])
+                        order.update(package_type_id=data['package_type_id'])
 
                         return HttpResponse(status=200)
 
@@ -118,11 +118,12 @@ class OrderView(View):
             {
                 'name': prop.product.name,
                 'price': prop.product.price,
-                'thumbnail_url': prop.product.thumbnail_url,
+                'small_image': prop.product.small_image,
                 'quantity': prop.quantity
             } for prop in cart
         ]
         total_q = sum(item['quantity'] for item in saved_cart)
+
         total_p = Cart.objects.annotate(
             price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
@@ -132,17 +133,18 @@ class OrderView(View):
         saved_order.total_price = base + saved_order.package_type.price
         saved_order.save()
 
-        shipping_address = Order.objects.get(user_id=request.user).user.address.through.objects.get(user_id=request.user).address
+        shipping_address = request.user.user_address_set.get(address_id__is_default=True)
 
         res = [saved_cart,
                {"total_quantity" : total_q},
                {"total_price" : saved_order.total_price},
-               {"address1" : shipping_address.address1},
-               {"city" : shipping_address.city},
-               {"state" : shipping_address.state},
-               {"postcode" : shipping_address.postcode.postcode},
-               {"country" : shipping_address.country},
-               {"shipping_cost" : shipping_address.postcode.shipping_cost}
+               {"address1" : shipping_address.address.address1},
+               {"address2" : shipping_address.address.address2},
+               {"city" : shipping_address.address.city},
+               {"state" : shipping_address.address.state},
+               {"postcode" : shipping_address.address.postcode.postcode},
+               {"country" : shipping_address.address.country},
+               {"shipping_cost" : shipping_address.address.postcode.shipping_cost}
         ]
         return JsonResponse({'cart': res}, status=200)
 
@@ -168,7 +170,7 @@ class OrderView(View):
             ).save()
             billing = BillingAddress.objects.filter(user=request.user).order_by('-id')[0]
 
-            shipping_cost = open_order.get().user.address.through.objects.get(user_id=request.user).address.postcode.shipping_cost
+            shipping_cost = request.user.user_address_set.get(address_id__is_default=True).address.postcode.shipping_cost
 
             Order(
                 billing_address_id = open_order.update(billing_address_id=billing),
@@ -204,18 +206,19 @@ class ReceiptView(View):
             } for prop in cart
         ]
 
-        shipping_address = Order.objects.get(user_id=request.user).user.address.through.objects.get(user_id=request.user).address
+        shipping_address = request.user.user_address_set.get(address_id__is_default=True)
 
         saved_order.is_closed = True
         saved_order.save()
 
         res = [saved_order.user.first_name,
                saved_order.user.last_name,saved_order.payment_option.payment,
-               shipping_address.address1,
-               shipping_address.city,
-               shipping_address.state,
-               shipping_address.postcode.postcode,
-               shipping_address.country,
+               shipping_address.address.address1,
+               shipping_address.address.address2,
+               shipping_address.address.city,
+               shipping_address.address.state,
+               shipping_address.address.postcode.postcode,
+               shipping_address.address.country,
                saved_cart,
                saved_order.total_price,
                saved_order.package_type.package
