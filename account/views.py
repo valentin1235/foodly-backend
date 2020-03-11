@@ -4,72 +4,59 @@ import re
 import bcrypt
 import requests
 
-from .models import User, Address , User_address
-
-from django.views import View
-from django.http import HttpResponse, JsonResponse
+from django.views           import View
+from django.http            import HttpResponse, JsonResponse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
+from .models                    import User, Address , User_address
 from foodly_project.my_settings import SECRET_KEY, ALGORITHM
-from .utils import login_check
+from .utils                     import login_check
 
-
-# Create your views here.
 def find_special(name):
     return bool(re.search('[-=+,#/\?:^$.@*\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…》]', name))
-
 
 def email_check(email):
     return bool(re.match('^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$', email))
 
-
 def find_space(string):
     return bool(re.search(' ', string))
 
-
 class SignUpView(View):
+
+    VALIDATION_RULES = {
+        "email" : {
+            "validator" : email_check,
+            "message"   : "invalid email"  
+        }, 
+        "first_name" : {
+            "validator" : find_special,
+            "message"   : "invalid first name"  
+        },
+        ....
+    }
+
     def post(self, request):
         data = json.loads(request.body)
 
         try:
-            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
-                'password'] is None:
-                return JsonResponse({'message': 'NOT_VALID'}, status=400)
-
-            if email_check(data['email']) is False:
-                return HttpResponse(status=400)
-
-            if User.objects.filter(email=data['email']).exists():
-                return HttpResponse(status=400)
-
-            if find_special(data['first_name']):
-                return HttpResponse(status=400)
-
-            if find_special(data['last_name']):
-                return HttpResponse(status=400)
-
-            if find_space(data['password']):
-                return HttpResponse(status=400)
-
-            if len(data["password"]) < 6:
-                return JsonResponse({"message": "비밀번호 짦음"}, status=400)
-
+            for field in data:
+                rule = VALIDATION_RULES[field]
+                if rule['validator'](data[field]):
+                    return JsonResponse({"error" : rule['message']}, status=400)
+    
             User(
-                email=data['email'],
-                first_name=data['first_name'],
-                last_name=data['last_name'],
-                password=bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+                email      = data['email'],
+                first_name = data['first_name'],
+                last_name  = data['last_name'],
+                password   = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             ).save()
 
             return JsonResponse({"message": "success"}, status=200)
-
         except ValidationError:
             return HttpResponse(status=400)
-
         except KeyError:
-            return HttpResponse(status=400)
-
+            return JsonResponse({'message': 'KEY_MISSING'}, status=400)
 
 class SignInView(View):
     def post(self, request):
@@ -85,15 +72,11 @@ class SignInView(View):
                     return JsonResponse({'access': token}, status=200, content_type="application/json")
 
                 return HttpResponse(status=401)
-
             return HttpResponse(status=400)
-
         except KeyError:
             return JsonResponse({"message": "INVALID_KEYS"}, status=400)
-
         except User.DoesNotExist:
             return JsonResponse({"message": "INVALID_USER"}, status=400)
-
 
 class KakaoSignInView(View):
     def get(self, request):
@@ -157,7 +140,6 @@ class AddressView(View):
             ).save()
 
             return JsonResponse({'message':'success'} , status=200)
-
         except KeyError:
             return HttpResponse(status=400)
         except TypeError:

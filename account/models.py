@@ -2,19 +2,18 @@ from django.db import models
 
 
 class User(models.Model):
-    email = models.EmailField(max_length=200, unique=True, verbose_name='email', null=True)
-    password = models.CharField(max_length=200, null=True)
-    first_name = models.CharField(max_length=45, null=True)
-    last_name = models.CharField(max_length=45, null=True)
-    create_at = models.DateTimeField(auto_now_add=True, null=True)
-    update_at = models.DateTimeField(auto_now=True, null=True)
-    is_delete = models.BooleanField(default=False)
-    address = models.ManyToManyField('Address', through='User_address')
-    kakao_id = models.CharField(max_length=250, null=True)
+    email      = models.EmailField(max_length = 200, unique = True, verbose_name = 'email', null = True)
+    password   = models.CharField(max_length               = 200, null       = True)
+    first_name = models.CharField(max_length               = 45, null        = True)
+    last_name  = models.CharField(max_length               = 45, null        = True)
+    create_at  = models.DateTimeField(auto_now_add         = True, null      = True)
+    update_at  = models.DateTimeField(auto_now             = True, null      = True)
+    is_delete  = models.BooleanField(default               = False)
+    address    = models.ManyToManyField('Address', through = 'User_address')
+    kakao_id   = models.CharField(max_length               = 250, null       = True)
 
     class Meta:
         db_table = 'users'
-
 
 class User_address(models.Model):
     address = models.ForeignKey('Address', on_delete=models.CASCADE, null=True)
@@ -40,6 +39,12 @@ class Address(models.Model):
     class Meta:
         db_table = 'addresses'
 
+# class Country:
+#     id
+#     name
+#     .....
+
+# "/country" GET ==> {country: [...]}
 
 class Postcode(models.Model):
     postcode = models.CharField(max_length=45)

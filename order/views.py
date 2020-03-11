@@ -13,9 +13,9 @@ class WishListView(View):
     @login_check
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            product = Product.objects.get(id=data['id'])
-            wishlist = WishList.objects.filter(user_id=request.user, product_id=data['id'])
+            data     = json.loads(request.body)
+            product  = Product.objects.get(id = data['id'])
+            wishlist = WishList.objects.filter(user = request.user, product_id = data['id'])
 
             if wishlist.exists():
                 wishlist.update(quantity=data['quantity'])
@@ -27,10 +27,6 @@ class WishListView(View):
                                     quantity=data['quantity'])
 
             return HttpResponse(status=200)
-
-        except WishList.DoesNotExist:
-            return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
-
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEY'}, status=400)
 
@@ -38,18 +34,19 @@ class WishListView(View):
     def get(self, request):
         saved_list = [
             {
-                'name': item.product.name,
-                'price': item.product.price,
-                'small_image': item.product.small_image,
-                'quantity': item.quantity
-            } for item in WishList.objects.filter(user_id=request.user)
+                'name'        : item.product.name,
+                'price'       : item.product.price,
+                'small_image' : item.product.small_image,
+                'quantity'    : item.quantity
+            } for item in WishList.objects.filter(user=request.user)
         ]
+
         return JsonResponse({'wishlist': saved_list}, status=200)
 
     @login_check
     def delete(self, request):
-        data = json.loads(request.body)
-        wishlist = WishList.objects.filter(user_id=request.user, product_id=data['id'])
+        data     = json.loads(request.body)
+        wishlist = WishList.objects.filter(user_id = request.user, product_id = data['id'])
 
         if wishlist.exists():
             wishlist.get().delete()
@@ -62,37 +59,37 @@ class CartView(View):
     @login_check
     def post(self, request):
         try:
-            data = json.loads(request.body)
-            product = Product.objects.filter(id=data['id'], is_in_stock=True)
-            cart = Cart.objects.filter(user_id=request.user, product_id=data['id'])
-            order = Order.objects.filter(user=request.user, is_closed=False)
+            data    = json.loads(request.body)
+            product = Product.objects.filter(id = data['id'], is_in_stock = True)
 
-            if product.exists():
-                if order.exists():
-                    if cart.exists():
-                        cart.update(quantity=data['quantity'])
-                        order.update(package_type_id=data['package_type_id'])
+            if not product.exists():
+	            return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
 
-                        return HttpResponse(status=200)
+            cart  = Cart.objects.filter(user_id = request.user, product_id = data['id'])
+            order = Order.objects.filter(user   = request.user, is_closed  = False)
 
-                    Cart.objects.create(
-                        user=request.user,
-                        order=order.get(),
-                        product_id=data['id'],
-                        quantity=data['quantity']
-                    )
-                    return HttpResponse(status=200)
+			if order.exists():
+				if cart.exists():
+					cart.update(quantity=data['quantity'])
+					order.update(package_type_id=data['package_type_id'])
 
-                Cart.objects.create(
-                    user=request.user,
-                    order=Order.objects.create(user=request.user),
-                    product_id=data['id'],
-                    quantity=data['quantity']
-                )
-                return HttpResponse(status=200)
+					return HttpResponse(status=200)
 
-            return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
-
+				Cart.objects.create(
+					user=request.user,
+					order=order.get(),
+					product_id=data['id'],
+					quantity=data['quantity']
+				)
+				return HttpResponse(status=200)
+			else:
+				Order.objects.create(
+					user       = request.user,
+					cart       = Cart.objects.create(user = request.user),
+					product_id = data['id'],
+					quantity   = data['quantity']
+				)
+				return HttpResponse(status=200)
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
 
@@ -122,21 +119,12 @@ class OrderView(View):
                 'quantity': prop.quantity
             } for prop in cart
         ]
-        total_q = sum(item['quantity'] for item in saved_cart)
-
-        total_p = Cart.objects.annotate(
-            price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
-
-        base = 0
-        for each_p in total_p:
-            base += each_p.price
-        saved_order.total_price = base + saved_order.package_type.price
-        saved_order.save()
-
-        shipping_address = request.user.user_address_set.get(address_id__is_default=True)
+        total_quantity   = (sum(item['quantity']), sum(item['price']) for item in saved_cart)
+        base             = 0
+        shipping_address = request.user.user_address_set.get(address_id__is_default = True)
 
         res = [saved_cart,
-               {"total_quantity" : total_q},
+               {"total_quantity" : total_quantity},
                {"total_price" : saved_order.total_price},
                {"address1" : shipping_address.address.address1},
                {"address2" : shipping_address.address.address2},
@@ -168,8 +156,8 @@ class OrderView(View):
                 state               = data['state'],
                 postcode            = data['postcode']
             ).save()
-            billing = BillingAddress.objects.filter(user=request.user).order_by('-id')[0]
 
+            billing 	  = BillingAddress.objects.filter(user=request.user).order_by('-id')[0]
             shipping_cost = request.user.user_address_set.get(address_id__is_default=True).address.postcode.shipping_cost
 
             Order(
@@ -182,13 +170,10 @@ class OrderView(View):
             coupon.is_used= True
 
             return HttpResponse(status=200)
-
         except Coupon.DoesNotExist:
             return JsonResponse({"message":"INVALID_COUPONS"}, status=400)
-
         except Order.DoesNotExist:
             return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
-
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
 

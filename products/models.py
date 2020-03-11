@@ -14,7 +14,7 @@ class Product(models.Model):
     fat             = models.CharField(max_length = 10, null = True)
     mineral         = models.CharField(max_length = 100, null = True)
     vitamin         = models.CharField(max_length = 100, null = True)
-    is_in_stock     = models.CharField(max_length = 30, null = True)
+    is_in_stock     = models.BooleanField(default = True, null = True)
     is_on_sale      = models.BooleanField(default = False)
     discount_rate   = models.CharField(max_length = 50, null = True)
     is_main         = models.BooleanField(default = False)
@@ -82,11 +82,11 @@ class ProductCategory(models.Model):
     class Meta:
         db_table = 'product_categories'
 
-class Sort(models.Model):
+class Tags(models.Model):
     keyword = models.CharField(max_length = 100, null = True)
 
     class Meta:
-        db_table = 'sorts'
+        db_table = 'tags'
 
 class Recipe(models.Model):
     title          = models.CharField(max_length = 100, null = True)

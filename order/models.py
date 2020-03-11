@@ -52,8 +52,8 @@ class PackageType(models.Model):
     class Meta:
         db_table = 'package_types'
 
-def get_package_type():
-    return PackageType.objects.get(id=1).id
+	def get_package_type():
+		return PackageType.objects.get(id=1).id
 
 class Order(models.Model):
     id               = models.UUIDField(primary_key = True, default = uuid.uuid4, editable = False, unique = True)
