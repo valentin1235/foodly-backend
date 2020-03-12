@@ -1,11 +1,12 @@
 import json
-from .models import Review
+
+from .models         import Review
 
 from products.models import Product
-from account.models import User
-from django.views import View
-from django.http import HttpResponse, JsonResponse
-from account.utils import login_check
+from account.models  import User
+from django.views    import View
+from django.http     import HttpResponse, JsonResponse
+from account.utils   import login_check
 
 
 class ReviewView(View):
