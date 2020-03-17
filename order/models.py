@@ -1,9 +1,9 @@
 import uuid
 
-from account.models import User
-from products.models import Product
+from account.models     import User
+from products.models    import Product
 
-from django.db import models
+from django.db          import models
 
 class PaymentOption(models.Model):
     payment = models.CharField(max_length = 100, unique = True)
