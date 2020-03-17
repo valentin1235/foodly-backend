@@ -1,0 +1,36 @@
+[2020-03-08 02:11:59 +0900] [1781] [INFO] Starting gunicorn 20.0.4
+[2020-03-08 02:11:59 +0900] [1781] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:11:59 +0900] [1781] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:00 +0900] [1781] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:00 +0900] [1781] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:01 +0900] [1781] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:01 +0900] [1781] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:02 +0900] [1781] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:02 +0900] [1781] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:03 +0900] [1781] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:03 +0900] [1781] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:04 +0900] [1781] [ERROR] Can't connect to ('0.0.0.0', 8000)
+[2020-03-08 02:12:10 +0900] [1789] [INFO] Starting gunicorn 20.0.4
+[2020-03-08 02:12:10 +0900] [1789] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:10 +0900] [1789] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:11 +0900] [1789] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:11 +0900] [1789] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:12 +0900] [1789] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:12 +0900] [1789] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:13 +0900] [1789] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:13 +0900] [1789] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:14 +0900] [1789] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:12:14 +0900] [1789] [ERROR] Retrying in 1 second.
+[2020-03-08 02:12:15 +0900] [1789] [ERROR] Can't connect to ('0.0.0.0', 8000)
+[2020-03-08 02:15:19 +0900] [1805] [INFO] Starting gunicorn 20.0.4
+[2020-03-08 02:15:19 +0900] [1805] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:15:19 +0900] [1805] [ERROR] Retrying in 1 second.
+[2020-03-08 02:15:20 +0900] [1805] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:15:20 +0900] [1805] [ERROR] Retrying in 1 second.
+[2020-03-08 02:15:21 +0900] [1805] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:15:21 +0900] [1805] [ERROR] Retrying in 1 second.
+[2020-03-08 02:15:22 +0900] [1805] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:15:22 +0900] [1805] [ERROR] Retrying in 1 second.
+[2020-03-08 02:15:23 +0900] [1805] [ERROR] Connection in use: ('0.0.0.0', 8000)
+[2020-03-08 02:15:23 +0900] [1805] [ERROR] Retrying in 1 second.
+[2020-03-08 02:15:24 +0900] [1805] [ERROR] Can't connect to ('0.0.0.0', 8000)

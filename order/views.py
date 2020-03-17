@@ -5,9 +5,9 @@ from products.models   import Product
 from account.models    import User
 from account.utils     import login_check
 
-from django.views import View
-from django.http import HttpResponse, JsonResponse
-from django.db.models import F, ExpressionWrapper, DecimalField
+from django.views      import View
+from django.http       import HttpResponse, JsonResponse
+from django.db.models  import F, ExpressionWrapper, DecimalField
 
 class WishListView(View):
     @login_check
@@ -15,7 +15,7 @@ class WishListView(View):
         try:
             data = json.loads(request.body)
             product = Product.objects.get(id=data['id'])
-            wishlist = WishList.objects.filter(user_id=request.user, product_id=data['id'])
+            wishlist = WishList.objects.filter(user=request.user, product_id=data['id'])
 
             if wishlist.exists():
                 wishlist.update(quantity=data['quantity'])
@@ -42,14 +42,14 @@ class WishListView(View):
                 'price': item.product.price,
                 'small_image': item.product.small_image,
                 'quantity': item.quantity
-            } for item in WishList.objects.filter(user_id=request.user)
+            } for item in WishList.objects.filter(user=request.user)
         ]
         return JsonResponse({'wishlist': saved_list}, status=200)
 
     @login_check
     def delete(self, request):
         data = json.loads(request.body)
-        wishlist = WishList.objects.filter(user_id=request.user, product_id=data['id'])
+        wishlist = WishList.objects.filter(user=request.user, product_id=data['id'])
 
         if wishlist.exists():
             wishlist.get().delete()
@@ -64,7 +64,7 @@ class CartView(View):
         try:
             data = json.loads(request.body)
             product = Product.objects.filter(id=data['id'], is_in_stock=True)
-            cart = Cart.objects.filter(user_id=request.user, product_id=data['id'])
+            cart = Cart.objects.filter(user=request.user, product_id=data['id'])
             order = Order.objects.filter(user=request.user, is_closed=False)
 
             if product.exists():
@@ -99,7 +99,7 @@ class CartView(View):
     @login_check
     def delete(self, request):
         data = json.loads(request.body)
-        cart = Cart.objects.filter(user_id=request.user, product_id=data['id'])
+        cart = Cart.objects.filter(user=request.user, product_id=data['id'])
 
         if cart.exists():
             cart.get().delete()
@@ -111,7 +111,7 @@ class CartView(View):
 class OrderView(View):
     @login_check
     def get(self, request):
-        saved_order = Order.objects.get(user_id=request.user, is_closed=False)
+        saved_order = Order.objects.get(user=request.user, is_closed=False)
         cart = saved_order.cart_set.all()
 
         saved_cart = [
@@ -122,10 +122,9 @@ class OrderView(View):
                 'quantity': prop.quantity
             } for prop in cart
         ]
-        total_q = sum(item['quantity'] for item in saved_cart)
 
-        total_p = Cart.objects.annotate(
-            price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
+        total_quantity  = sum(item['quantity'] for item in saved_cart)
+        total_price     = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
         base = 0
         for each_p in total_p:
@@ -195,7 +194,7 @@ class OrderView(View):
 class ReceiptView(View):
     @login_check
     def get(self, request):
-        saved_order = Order.objects.get(user_id=request.user, is_closed=False)
+        saved_order = Order.objects.get(user=request.user, is_closed=False)
         cart = saved_order.cart_set.all()
 
         saved_cart = [
