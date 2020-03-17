@@ -127,7 +127,7 @@ class OrderView(View):
         total_price     = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
         base = 0
-        for each_p in total_p:
+        for each_p in total_price:
             base += each_p.price
         saved_order.total_price = base + saved_order.package_type.price
         saved_order.save()
@@ -135,7 +135,7 @@ class OrderView(View):
         shipping_address = request.user.user_address_set.get(address_id__is_default=True)
 
         res = [saved_cart,
-               {"total_quantity" : total_q},
+               {"total_quantity" : total_quantity},
                {"total_price" : saved_order.total_price},
                {"address1" : shipping_address.address.address1},
                {"address2" : shipping_address.address.address2},
