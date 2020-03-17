@@ -2,9 +2,9 @@
 
 Web grocery market *Foodly* clone. (https://foodly-store.myshopify.com/)
 
-Project Period: 2 weeks
++ Project Period: 2 weeks
 
-Members: (back) Seunghyun Ahn, Sooyeon Kim, Heechul Yoon, 
++ Members: (back) Seunghyun Ahn, Sooyeon Kim, Heechul Yoon, 
          (front) Yaeji Choi, Eunji Hwang, Kihyun Kwun
          
 # Demo
