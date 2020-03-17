@@ -1,6 +1,6 @@
 # Introduction
 
-Web grocery market *Foodly* clone. (https://foodly-store.myshopify.com/)
+Web grocery market [Foodly](https://foodly-store.myshopify.com/) clone. 
 
 + Project Period  : 2 weeks
 
@@ -8,8 +8,8 @@ Web grocery market *Foodly* clone. (https://foodly-store.myshopify.com/)
                     (front) Yaeji Choi, Eunji Hwang, Kihyun Kwun
          
 # Demo
-
-[![Foodly demo](https://i.ibb.co/DbfDptM/Screen-Shot-2020-03-17-at-8-46-32-PM.png)](https://www.youtube.com/watch?v=1K8aV-KZMQw&feature=youtu.be)
+Click below image to see our demo.
+[![Foodly demo](https://i.ibb.co/DbfDptM/Screen-Shot-2020-03-17-at-8-46-32-PM.png=200x)](https://www.youtube.com/watch?v=1K8aV-KZMQw&feature=youtu.be)
 
 # Features
 + Signup and signin features.
@@ -27,7 +27,7 @@ Web grocery market *Foodly* clone. (https://foodly-store.myshopify.com/)
 + Web Scraping  : BeautifulSoup 4.0, Pandas
 
 # API Documentation
-
+Find our API documentations [here]().
 
 # Database Modeling
 ![Foodly ERD](https://i.ibb.co/rFFmfMf/foodly-20200317-21-43.png)
