@@ -2,19 +2,20 @@
 
 Web grocery market *Foodly* clone. (https://foodly-store.myshopify.com/)
 
-+ Project Period: 2 weeks
++ Project Period  : 2 weeks
 
-+ Members: (back) Seunghyun Ahn, Sooyeon Kim, Heechul Yoon, 
-         (front) Yaeji Choi, Eunji Hwang, Kihyun Kwun
++ Members         : (back) Seunghyun Ahn, Sooyeon Kim, Heechul Yoon, 
+                    (front) Yaeji Choi, Eunji Hwang, Kihyun Kwun
          
 # Demo
 
-[![Foodly demo](https://ibb.co/ky2g1xD)](https://www.youtube.com/watch?v=1K8aV-KZMQw&feature=youtu.be)
+[![Foodly demo](https://i.ibb.co/DbfDptM/Screen-Shot-2020-03-17-at-8-46-32-PM.png)](https://www.youtube.com/watch?v=1K8aV-KZMQw&feature=youtu.be)
 
 # Features
-+
-+
-+
++ Signup and signin features.
++ Show similar products of a chosen product.
++ Add, change, and delete items in a user's wishlist and cart.
+
 
 # Technologies
 + Language      : Python
@@ -29,4 +30,4 @@ Web grocery market *Foodly* clone. (https://foodly-store.myshopify.com/)
 
 
 # Database Modeling
-![Foodly ERD](https://ibb.co/9ccN323)
+![Foodly ERD](https://i.ibb.co/rFFmfMf/foodly-20200317-21-43.png)
