@@ -44,6 +44,9 @@ class Measure(models.Model):
 class Season(models.Model):
     name = models.CharField(max_length = 50)
 
+    class Meta:
+        db_table = 'seasons'
+
 class SimilarProduct(models.Model):
     from_product = models.ForeignKey('Product', on_delete = models.SET_NULL, null = True, related_name = 'from_product')
     to_product   = models.ForeignKey('Product', on_delete = models.SET_NULL, null = True, related_name = 'to_product')
@@ -81,12 +84,6 @@ class ProductCategory(models.Model):
 
     class Meta:
         db_table = 'product_categories'
-
-class Sort(models.Model):
-    keyword = models.CharField(max_length = 100, null = True)
-
-    class Meta:
-        db_table = 'sorts'
 
 class Recipe(models.Model):
     title          = models.CharField(max_length = 100, null = True)
