@@ -1,17 +1,17 @@
 import json
 
-from django.db    import IntegrityError
-from django.views import View
+from django.db        import IntegrityError
+from django.views     import View
 from django.db.models import Count
-from django.http  import HttpResponse, JsonResponse
+from django.http      import HttpResponse, JsonResponse
 
 from products.models import Product, Recipe, Bundle
 
 class HomeView(View):
     def get(self, request):
         product_data_caching = Product.objects.prefetch_related('category').select_related('season', 'harvest_year', 'measure') 
-        bundles = Bundle.objects.prefetch_related('product_set').all()
-        bundle_deal = [
+        bundles              = Bundle.objects.prefetch_related('product_set').all()
+        bundle_deal          = [
                 {
                     'title'   : bundle.title,
                     'price'   : bundle.price,

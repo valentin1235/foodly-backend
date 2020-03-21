@@ -9,7 +9,7 @@ from .views import (
         BundleView,
         RecommendationView,
         SearchView,
-        )
+)
 
 urlpatterns = [
         path('/collections/product', ProductView.as_view()),
