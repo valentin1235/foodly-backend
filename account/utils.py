@@ -20,9 +20,6 @@ def login_check(func):
         except User.DoesNotExist:
             return JsonResponse({'message': 'INVALID_USER'}, status=401)
 
-        except TypeError:
-            return JsonResponse({'message': 'INVALID_VALUE'}, status=400)
-
         except KeyError:
             return JsonResponse({'message': 'INVALID'}, status=400)
 
