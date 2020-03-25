@@ -28,8 +28,8 @@ Click below image to see our demo.
 + Web Scraping  : BeautifulSoup 4.0, Pandas
 
 # API Documentation
-+ [signup, signin, order](https://documenter.getpostman.com/view/10398571/SzS4T8ME).
-+ [products](https://documenter.getpostman.com/view/10644576/SzS8rjuD?version=latest#09377cd1-b1c6-47cc-930d-0c6e2d84c1ba).
++ [signup, signin, order](https://documenter.getpostman.com/view/10398571/SzS4T8ME)
++ [products](https://documenter.getpostman.com/view/10644576/SzS8rjuD?version=latest#09377cd1-b1c6-47cc-930d-0c6e2d84c1ba)
 
 
 # Database Modeling
