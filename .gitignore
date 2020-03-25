@@ -1,5 +1,8 @@
 # Created by https://www.gitignore.io/api/linux,macos,django,python
 # Edit at https://www.gitignore.io/?templates=linux,macos,django,python
+### Docker ###
+Dockerfile
+
 ### Django ###
 .idea/
 my_settings.py

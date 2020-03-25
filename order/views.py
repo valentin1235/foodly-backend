@@ -28,8 +28,8 @@ class WishListView(View):
 
             return HttpResponse(status=200)
 
-        except WishList.DoesNotExist:
-            return JsonResponse({'message': 'INVALID_ACTION'}, status=400)
+        except Product.DoesNotExist:
+            return JsonResponse({'message': 'INVALID_PRDUCT_ID'}, status=400)
 
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEY'}, status=400)
@@ -38,10 +38,10 @@ class WishListView(View):
     def get(self, request):
         saved_list = [
             {
-                'name': item.product.name,
-                'price': item.product.price,
-                'small_image': item.product.small_image,
-                'quantity': item.quantity
+                'name'          : item.product.name,
+                'price'         : item.product.price,
+                'small_image'   : item.product.small_image,
+                'quantity'      : item.quantity
             } for item in WishList.objects.filter(user=request.user)
         ]
         return JsonResponse({'wishlist': saved_list}, status=200)
@@ -62,36 +62,38 @@ class CartView(View):
     @login_check
     def post(self, request):
         try:
-            data = json.loads(request.body)
+            data    = json.loads(request.body)
             product = Product.objects.filter(id=data['id'], is_in_stock=True)
-            cart = Cart.objects.filter(user=request.user, product_id=data['id'])
-            order = Order.objects.filter(user=request.user, is_closed=False)
 
-            if product.exists():
-                if order.exists():
-                    if cart.exists():
-                        cart.update(quantity=data['quantity'])
-                        order.update(package_type_id=data['package_type_id'])
+            if not product.exists():
+                return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
+ 
+            cart    = Cart.objects.filter(user=request.user, product_id=data['id'])
+            order   = Order.objects.filter(user=request.user, is_closed=False)
 
-                        return HttpResponse(status=200)
+            if order.exists():
+                if cart.exists():
+                    cart.update(quantity=data['quantity'])
+                    order.update(package_type_id=data['package_type_id'])
 
-                    Cart.objects.create(
-                        user=request.user,
-                        order=order.get(),
-                        product_id=data['id'],
-                        quantity=data['quantity']
-                    )
                     return HttpResponse(status=200)
 
                 Cart.objects.create(
-                    user=request.user,
-                    order=Order.objects.create(user=request.user),
-                    product_id=data['id'],
-                    quantity=data['quantity']
+                    user        = request.user,
+                    order       = order.get(),
+                    product_id  = data['id'],
+                    quantity    = data['quantity']
                 )
                 return HttpResponse(status=200)
 
-            return JsonResponse({'message': 'OUT_OF_STOCK'}, status=200)
+            else:
+                Cart.objects.create(
+                    user        = request.user,
+                    order       = Order.objects.create(user=request.user),
+                    product_id  = data['id'],
+                    quantity    = data['quantity']
+                )
+                return HttpResponse(status=200)
 
         except KeyError:
             return JsonResponse({'message': 'INVALID_KEYS'}, status=400)
@@ -111,41 +113,48 @@ class CartView(View):
 class OrderView(View):
     @login_check
     def get(self, request):
-        saved_order = Order.objects.get(user=request.user, is_closed=False)
-        cart = saved_order.cart_set.all()
+        try:
+            saved_order = Order.objects.get(user=request.user, is_closed=False)
+            cart        = saved_order.cart_set.all()
 
-        saved_cart = [
-            {
-                'name': prop.product.name,
-                'price': prop.product.price,
-                'small_image': prop.product.small_image,
-                'quantity': prop.quantity
-            } for prop in cart
-        ]
+            saved_cart = [
+                {
+                    'name'          : prop.product.name,
+                    'price'         : prop.product.price,
+                    'small_image'   : prop.product.small_image,
+                    'quantity'      : prop.quantity
+                } for prop in cart
+            ]
 
-        total_quantity  = sum(item['quantity'] for item in saved_cart)
-        total_price     = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
+            total_quantity  = sum(item['quantity'] for item in saved_cart)
+            total_price     = Cart.objects.annotate(price=ExpressionWrapper(F('quantity') * F('product__price'), output_field=DecimalField(10, 2)))
 
-        base = 0
-        for each_p in total_price:
-            base += each_p.price
-        saved_order.total_price = base + saved_order.package_type.price
-        saved_order.save()
+            base = 0
+            for each_price in total_price:
+                base += each_price.price
+            saved_order.total_price = base + saved_order.package_type.price
+            saved_order.save()
 
-        shipping_address = request.user.user_address_set.get(address_id__is_default=True)
+            shipping_address = request.user.user_address_set.get(address_id__is_default=True)
 
-        res = [saved_cart,
-               {"total_quantity" : total_quantity},
-               {"total_price" : saved_order.total_price},
-               {"address1" : shipping_address.address.address1},
-               {"address2" : shipping_address.address.address2},
-               {"city" : shipping_address.address.city},
-               {"state" : shipping_address.address.state},
-               {"postcode" : shipping_address.address.postcode.postcode},
-               {"country" : shipping_address.address.country},
-               {"shipping_cost" : shipping_address.address.postcode.shipping_cost}
-        ]
-        return JsonResponse({'cart': res}, status=200)
+            res = [saved_cart,
+                {"total_quantity"   : total_quantity},
+                {"total_price"      : saved_order.total_price},
+                {"address1"         : shipping_address.address.address1},
+                {"address2"         : shipping_address.address.address2},
+                {"city"             : shipping_address.address.city},
+                {"state"            : shipping_address.address.state},
+                {"postcode"         : shipping_address.address.postcode.postcode},
+                {"country"          : shipping_address.address.country},
+                {"shipping_cost"    : shipping_address.address.postcode.shipping_cost}
+            ]
+            return JsonResponse({'cart': res}, status=200)
+
+        except Order.DoesNotExist():
+            return JsonResponse({"message":"NO_ORDERS"}, status=400)
+
+        except Cart.DoesNotExist():
+            return JsonResponse({"message":"NO_CARTS"}, status=400)        
 
     @login_check
     def post(self,request):
