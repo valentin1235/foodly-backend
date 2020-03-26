@@ -146,31 +146,33 @@ class RecommendationView(View):
 
         return JsonResponse({'data' : recommended_recipe}, status = 200)
 
-
 class SearchView(View):
 
     def get(self, request):
-        query = request.GET.get('search', None)
+        query = request.GET.get('keyword', None)
 
         if len(query) > 2:
-            recipe_data = Recipe.objects.filter(Q(title__icontains=query)).all()
+            recipe_data  = Recipe.objects.filter(Q(title__icontains=query)).all()
             product_data = Product.objects.filter(Q(name__icontains=query)).select_related('harvest_year').all()
 
-
-            data={'product':[{
-                'id' : product.id,
-                'name':product.name,
-                'price':product.price,
-                'description':product.description,
-                'small_image':product.small_image,
-                'harvest_year' : product.harvest_year.year,
-                }for product in product_data],
-                'recipe':[{
-                'id':recipe.id,
-                'title':recipe.title,
-                'ingredient':recipe.ingredient,
-                'description':recipe.description,
-                'thumbnail_url':recipe.thumbnail_url,
-            }for recipe in recipe_data]}
+            data={
+					'product':[{
+						'id'           : product.id,
+						'name'         : product.name,
+						'price'        : product.price,
+						'description'  : product.description,
+						'small_image'  : product.small_image,
+						'harvest_year' : product.harvest_year.year,
+					} for product in product_data],
+					'recipe'            : [{
+						'id'            : recipe.id,
+						'title'         : recipe.title,
+						'ingredient'    : recipe.ingredient,
+						'description'   : recipe.description,
+						'thumbnail_url' : recipe.thumbnail_url,
+					} for recipe in recipe_data]
+				}
 
             return JsonResponse({'data':data},status=200)
+
+		return JsonResponse({"error" : "invalid keyword"}, status=400)
