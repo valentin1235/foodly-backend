@@ -4,15 +4,15 @@ import re
 import bcrypt
 import requests
 
-from .models import User, Address , User_address
+from .models                    import User,         Address , User_address
 
-from django.views import View
-from django.http import HttpResponse, JsonResponse
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
+from django.views               import View
+from django.http                import HttpResponse, JsonResponse
+from django.core.validators     import validate_email
+from django.core.exceptions     import ValidationError
 
-from foodly_project.my_settings import SECRET_KEY, ALGORITHM
-from .utils import login_check
+from foodly_project.my_settings import SECRET_KEY,   ALGORITHM
+from .utils                     import login_check
 
 
 # Create your views here.
@@ -29,28 +29,34 @@ def find_space(string):
 
 
 class SignUpView(View):
+
+    VALIDATION_RULES = {
+        "email" : {
+            "validator" : email_check,
+            "message" : "invalid email"
+        },
+        "first_name" : {
+            "validator" : find_special,
+            "message" : "invalid first name"
+        },
+        "last_name" : {
+            "validator" : find_special,
+            "message" : "invalid last name"
+        },
+        "password" : {
+            "validator" : find_space,
+            "message" : "invalid password"
+        },
+    }
+
     def post(self, request):
         data = json.loads(request.body)
 
         try:
-            if data['email'] is None or data['first_name'] is None or data['last_name'] is None or data[
-                'password'] is None:
-                return JsonResponse({'message': 'NOT_VALID'}, status=400)
-
-            if email_check(data['email']) is False:
-                return HttpResponse(status=400)
-
-            if User.objects.filter(email=data['email']).exists():
-                return HttpResponse(status=400)
-
-            if find_special(data['first_name']):
-                return HttpResponse(status=400)
-
-            if find_special(data['last_name']):
-                return HttpResponse(status=400)
-
-            if find_space(data['password']):
-                return HttpResponse(status=400)
+            for field in data:
+                rule =VALIDATION_RULES[field]
+                if rule['validator'](data[field]):
+                    return JsonResponse({'error' : rule['message']} , status=400)
 
             if len(data["password"]) < 6:
                 return JsonResponse({"message": "비밀번호 짦음"}, status=400)
@@ -62,7 +68,7 @@ class SignUpView(View):
                 password=bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             ).save()
 
-            return JsonResponse({"message": "success"}, status=200)
+            return HttpResponse(status=200)
 
         except ValidationError:
             return HttpResponse(status=400)
