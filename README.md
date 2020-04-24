@@ -13,9 +13,11 @@ Click below image to see our demo.
 [![Foodly demo](https://i.ibb.co/DbfDptM/Screen-Shot-2020-03-17-at-8-46-32-PM.png=200x)](https://www.youtube.com/watch?v=1K8aV-KZMQw&feature=youtu.be)
 
 # Features
-+ Signup and signin features.
-+ Show similar products of a chosen product.
-+ Add, change, and delete items in a user's wishlist and cart.
++ Signup and signin features(Seunghyun Ahn).
++ Display all items with the features of pagination and sorting(Heechul Yoon)
++ Show bundle items as promotion(Heechul Yoon)
++ Show similar products of a chosen product(Heechul Yoon)
++ Add, change, and delete items in a user's wishlist and cart(Sooyeon Kim).
 
 
 # Technologies
