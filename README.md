@@ -6,6 +6,49 @@ Web grocery market [Foodly](https://foodly-store.myshopify.com/) clone.
 
 + Members         : (back) Seunghyun Ahn, Sooyeon Kim, Heechul Yoon, (front) Yaeji Choi, Eunji Hwang, Kihyun Kwun
          
+# 담당 개발 내역
+[Modeling]
+- 크게 user, product, order 로 분류
+- 자기참조 : 유사상품 개념을 표현
+- 하나의 상품이 시즌정보를 가지도록 설계
+- 여러개의 상품을 번들로 묶어서 판매하는 프로모션 
+- 장바구니와 주문 
+
+[Django 프로젝트 초기 설계]
+- my_settings.py : database 정보, secret key, jwt 알고리즘 정보 관리
+- requirements.txt : 개발 환경 공유
+
+[상품 / 레시피 데이터 크롤링]
+- beautiful soup, requests
+- pandas 를 통한 csv 파일 생성
+
+[홈화면 데이터 표출] 
+- 카테고리별 상품 표출
+- 시즌별 상품 표출
+- 세일 상품 표출
+
+[상품 리스트 표출]
+- 전체 상품 / 카테고리별 상품 표출
+- 가격 / 이름 을 기준으로 받아서 정렬
+- pagination : offset과 limit을 받아서 구현
+
+[상품 상세 정보 표출]
+
+[번들 프로모션 상품 표출]
+- 상품과 번들 프로모션은 서로가 서로를 여러개 가질 수 있는 many to many 관계. 
+- 하나의 번들 프로모션이 여러개의 상품을 가지고 있고 묶음으로 가격이 정해짐
+- 번들 프로모션의 가격과 그에 포함된 상품들을 가져와 표출
+- 프로모션 기간이 끝나면 is_in_promotion 컬럼이 False로 바뀜
+
+[레시피 리스트 표출]
+- pagination : offset과 limit을 받아서 구현
+
+[레시피 상세 정보 표출]
+
+[추천 레시피 표출]
+- 하나의 레시피는 여러개의 상품을 가지고 있는 one to many관계에 있음
+- 추천 레시피와 레시피에 포함된 상품들을 표출
+         
 # Demo
 Click below image to see our demo.
 
