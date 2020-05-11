@@ -33,6 +33,7 @@ Web grocery market [Foodly](https://foodly-store.myshopify.com/) clone.
 - pagination : offset과 limit을 받아서 구현
 
 [상품 상세 정보 표출]
+- 상품의 상세정보(영양정보, 유사상품, 가격 등) 표출
 
 [번들 프로모션 상품 표출]
 - 상품과 번들 프로모션은 서로가 서로를 여러개 가질 수 있는 many to many 관계. 
@@ -44,6 +45,7 @@ Web grocery market [Foodly](https://foodly-store.myshopify.com/) clone.
 - pagination : offset과 limit을 받아서 구현
 
 [레시피 상세 정보 표출]
+- 레시피 상세정보(제조법, 레시피 설명, 저자 등) 표출
 
 [추천 레시피 표출]
 - 하나의 레시피는 여러개의 상품을 가지고 있는 one to many관계에 있음
