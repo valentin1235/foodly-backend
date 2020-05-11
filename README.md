@@ -1,12 +1,20 @@
-# Introduction
+## Introduction
 
-Web grocery market [Foodly](https://foodly-store.myshopify.com/) clone. 
+#### Topic 
+- 온라인 유기농 식재료 마켓 클론 프로젝트
 
-+ Project Period  : 2 weeks
+#### Team 
+- 프론트앤드 3명, 백앤드 3명
 
-+ Members         : (back) Seunghyun Ahn, Sooyeon Kim, Heechul Yoon, (front) Yaeji Choi, Eunji Hwang, Kihyun Kwun
+#### Project Period 
+- 2020.02.27 - 2020.03.06
+
+#### Coworking 
+- Trello를 스크럼방식 협업
+- 주단위 백로그작성
+- 일단위 스탠드업미팅
          
-# 담당 개발 내역
+## 담당 개발 내역
 [Modeling]
 - 크게 user, product, order 로 분류
 - 자기참조 : 유사상품 개념을 표현
@@ -51,13 +59,13 @@ Web grocery market [Foodly](https://foodly-store.myshopify.com/) clone.
 - 하나의 레시피는 여러개의 상품을 가지고 있는 one to many관계에 있음
 - 추천 레시피와 레시피에 포함된 상품들을 표출
          
-# Demo
+## Demo
 Click below image to see our demo.
 
 
 [![Foodly demo](https://i.ibb.co/DbfDptM/Screen-Shot-2020-03-17-at-8-46-32-PM.png=200x)](https://www.youtube.com/watch?v=1K8aV-KZMQw&feature=youtu.be)
 
-# Features
+## APIs
 + Signup and signin features(Seunghyun Ahn).
 + Display all items with the features of pagination and sorting(Heechul Yoon)
 + Show bundle items as promotion(Heechul Yoon)
@@ -65,19 +73,20 @@ Click below image to see our demo.
 + Add, change, and delete items in a user's wishlist and cart(Sooyeon Kim).
 
 
-# Technologies
-+ Language      : Python
-+ Web Framework : Django 3.0
-+ Database      : AWS RDS with MySQL
-+ HTTP headers  : Cross-Origin Resource Sharing (CORS) headers
-+ Encryption    : bcrypt
-+ Web Token     : JWT
-+ Web Scraping  : BeautifulSoup 4.0, Pandas
+## Technologies
++ Language           : Python 3.8.0
++ Web Framework      : Django 3.0.4
++ Database           : AWS RDS with MySQL
++ HTTP headers       : Cross-Origin Resource Sharing (CORS) headers
++ Encryption         : bcrypt
++ Web Token          : JWT
++ Web Scraping       : BeautifulSoup 4.0, Pandas
++ Version management : Git
 
-# API Documentation
+## API Documentation
 + [signup, signin, order](https://documenter.getpostman.com/view/10398571/SzS4T8ME)
 + [products](https://documenter.getpostman.com/view/10644576/SzS8rjuD?version=latest#09377cd1-b1c6-47cc-930d-0c6e2d84c1ba)
 
 
-# Database Modeling
+## Database Modeling
 ![Foodly ERD](https://i.ibb.co/rFFmfMf/foodly-20200317-21-43.png)
